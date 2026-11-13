@@ -1,0 +1,933 @@
+{
+ "_comment": "Reference example of the production bar (wild, 16:9, 53.5 s). Study how it is built - beat grid, b-roll on most beats, a different entrance per moment, one signature device, graphics carrying real facts, a strong end card - then build your own from your concept. Do not copy its structure onto another subject.",
+ "_assets": "broll/*.mp4 = stock clips found with stock_search.py; audio/m126.mp3 = Mixkit 'Trap Electro Vibes'; assets/triple_split.mp4 = compose.py split; assets/phone_demo.mp4 = compose.py phone; assets/hero_on_purple.png = compose.py field; fonts via get_fonts.py Bungee, Space Grotesk:700, JetBrains Mono:800.",
+ "canvas": {
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "background": "#000000"
+ },
+ "output": "How_It_Works.mp4",
+ "seed": 11,
+ "beat": {
+  "bpm": 139.02,
+  "offset": 0
+ },
+ "music": {
+  "src": "audio/m126.mp3",
+  "start": 0.015,
+  "fade_in": 0.05,
+  "fade_out": 2.0
+ },
+ "loudness": -14,
+ "fade": {
+  "out": 1.0
+ },
+ "meta": {
+  "platform": "presentation",
+  "target_seconds": 53,
+  "goal": "inform",
+  "facts": [
+   "B09V366BDY",
+   "4.4 stars",
+   "42,000+ ratings",
+   "16 million colors",
+   "3 concepts",
+   "27 s promo",
+   "frame 0",
+   "3 2 1",
+   "9:16",
+   "progress bar to 100"
+  ],
+  "level": "wild",
+  "concept": "One ASIN in, one produced video out - shown as the tool's own process, step by step, on the beat.",
+  "device": "Chat-to-cinema: a typed request kicks off a countdown, numbered steps land on the beat, the finished video plays in a phone on the breakdown."
+ },
+ "scenes": [
+  {
+   "type": "clip",
+   "src": "broll/typing_dark.mp4",
+   "in": 1.0,
+   "beats": 8,
+   "camera": "push-in",
+   "camera_amount": 0.06,
+   "grade": "teal-orange",
+   "effects": [
+    "vignette",
+    {
+     "type": "grain",
+     "amount": 0.7
+    }
+   ],
+   "layers": [
+    {
+     "text": "ONE ASIN.",
+     "font": "Bungee",
+     "size": 230,
+     "y": 0.4,
+     "color": "#ffffff",
+     "glow": "#ff2bd6",
+     "glow_radius": 26,
+     "in": "none",
+     "beat_bounce": 0.03
+    },
+    {
+     "text": "one produced video",
+     "font": "SpaceGrotesk-700",
+     "size": 84,
+     "y": 0.6,
+     "color": "#22e4ff",
+     "case": "upper",
+     "tracking": 6,
+     "start": "4b",
+     "in": {
+      "anim": "letters",
+      "dur": 0.5
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/man_typing_dark.mp4",
+   "in": 2.0,
+   "beats": 8,
+   "camera": "drift",
+   "camera_amount": 0.05,
+   "grade": "teal-orange",
+   "effects": [
+    "vignette",
+    {
+     "type": "grain",
+     "amount": 0.7
+    }
+   ],
+   "transition": {
+    "type": "glitch",
+    "dur": 0.2
+   },
+   "layers": [
+    {
+     "text": "Just ask.",
+     "font": "Bungee",
+     "size": 150,
+     "x": 0.24,
+     "y": 0.44,
+     "color": "#ffffff",
+     "stroke": 6,
+     "stroke_color": "#0d0221",
+     "in": {
+      "anim": "pop",
+      "dur": 0.35
+     }
+    },
+    {
+     "text": "in plain words",
+     "font": "JetBrainsMono-800",
+     "size": 46,
+     "x": 0.24,
+     "y": 0.58,
+     "color": "#b6ff3b",
+     "start": "1b",
+     "in": {
+      "anim": "typewriter"
+     }
+    },
+    {
+     "type": "block",
+     "block": "messages",
+     "x": 0.74,
+     "y": 0.5,
+     "w": 0.44,
+     "start": "1b",
+     "props": {
+      "font": "SpaceGrotesk-700",
+      "accent": "#ff2bd6",
+      "gap": 2.2,
+      "messages": [
+       {
+        "from": "me",
+        "text": "Make a wildly creative promo for ASIN B09V366BDY"
+       },
+       {
+        "from": "them",
+        "text": "On it. Reading the listing..."
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "type": "card",
+   "src": "assets/pack_shot.jpg",
+   "beats": 8,
+   "transition": {
+    "type": "circle-open",
+    "dur": 0.35
+   },
+   "card": {
+    "cutout": true,
+    "outline": [
+     10,
+     "#ffffff"
+    ],
+    "w": 0.4,
+    "h": 0.74,
+    "x": 0.7,
+    "y": 0.52,
+    "bg": [
+     "#0d0221",
+     "#3a0ca3",
+     "#7209b7"
+    ],
+    "glow": "cycle",
+    "float": 10,
+    "rotate": -3,
+    "enter": "elastic"
+   },
+   "overlay": {
+    "type": "bokeh",
+    "amount": 0.45
+   },
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.06,
+     "y": 0.26,
+     "anchor": "w",
+     "w": 0.46,
+     "props": {
+      "number": 1,
+      "label": "Reads the listing",
+      "accent": "#22e4ff",
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "type": "block",
+     "block": "stars",
+     "x": 0.06,
+     "y": 0.5,
+     "anchor": "w",
+     "w": 0.46,
+     "start": "2b",
+     "props": {
+      "value": 4.4,
+      "count": "42,000+",
+      "label": "ratings",
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "type": "block",
+     "block": "callout",
+     "x": 0.06,
+     "y": 0.72,
+     "anchor": "w",
+     "w": 0.36,
+     "start": "4b",
+     "props": {
+      "text": "Title, benefits, images",
+      "pointer": "right",
+      "accent": "#ffe53b",
+      "font": "SpaceGrotesk-700"
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/neon_trails.mp4",
+   "in": 2.0,
+   "beats": 4,
+   "transition": {
+    "type": "zoom",
+    "dur": 0.2
+   },
+   "grade": "vivid",
+   "effects": [
+    "beat-flash",
+    "vignette"
+   ],
+   "layers": [
+    {
+     "text": "3",
+     "font": "Bungee",
+     "size": 420,
+     "y": 0.5,
+     "color": "#22e4ff",
+     "glow": "#22e4ff",
+     "end": "1b",
+     "in": {
+      "anim": "drop",
+      "dur": 0.25
+     },
+     "flash_ok": true
+    },
+    {
+     "text": "2",
+     "font": "Bungee",
+     "size": 420,
+     "y": 0.5,
+     "color": "#ff2bd6",
+     "glow": "#ff2bd6",
+     "start": "1b",
+     "end": "2b",
+     "in": {
+      "anim": "drop",
+      "dur": 0.25
+     },
+     "flash_ok": true
+    },
+    {
+     "text": "1",
+     "font": "Bungee",
+     "size": 420,
+     "y": 0.5,
+     "color": "#ffe53b",
+     "glow": "#ffe53b",
+     "start": "2b",
+     "end": "3b",
+     "in": {
+      "anim": "drop",
+      "dur": 0.25
+     },
+     "flash_ok": true
+    },
+    {
+     "text": "ACTION",
+     "font": "Bungee",
+     "size": 300,
+     "y": 0.5,
+     "color": "#ffffff",
+     "glow": "#ff2bd6",
+     "start": "3b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.3
+     },
+     "flash_ok": true
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/neon_streaks.mp4",
+   "in": 1.0,
+   "beats": 8,
+   "transition": {
+    "type": "flash",
+    "dur": 0.15
+   },
+   "camera": "pulse",
+   "camera_amount": 0.06,
+   "grade": "vivid",
+   "effects": [
+    "beat-flash",
+    "glitch-in"
+   ],
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.42,
+     "props": {
+      "number": 2,
+      "label": "Pitches 3 concepts",
+      "accent": "#0d0221",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "text": "PARTY MODE",
+     "font": "Bungee",
+     "size": 150,
+     "y": 0.38,
+     "color": "#ffffff",
+     "stroke": 9,
+     "stroke_color": "#0d0221",
+     "start": "1b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.3
+     }
+    },
+    {
+     "text": "16M COLORS",
+     "font": "Bungee",
+     "size": 150,
+     "y": 0.58,
+     "color": "#ffe53b",
+     "stroke": 9,
+     "stroke_color": "#0d0221",
+     "start": "3b",
+     "in": {
+      "anim": "drop",
+      "dur": 0.35
+     }
+    },
+    {
+     "text": "YOUR ROOM CALLED",
+     "font": "Bungee",
+     "size": 130,
+     "y": 0.78,
+     "color": "#22e4ff",
+     "stroke": 9,
+     "stroke_color": "#0d0221",
+     "start": "5b",
+     "in": {
+      "anim": "elastic",
+      "dur": 0.4
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "assets/triple_split.mp4",
+   "in": 0,
+   "beats": 8,
+   "transition": {
+    "type": "whip-left",
+    "dur": 0.25
+   },
+   "grade": "vivid",
+   "effects": [
+    {
+     "type": "grain",
+     "amount": 0.6
+    }
+   ],
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.42,
+     "props": {
+      "number": 3,
+      "label": "Hunts the b-roll",
+      "accent": "#ff2bd6",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "text": "B-ROLL BY DEFAULT",
+     "font": "Bungee",
+     "size": 120,
+     "y": 0.62,
+     "color": "#ffffff",
+     "panel": {
+      "color": "#0d0221",
+      "opacity": 0.78,
+      "radius": 16,
+      "pad": 26
+     },
+     "start": "2b",
+     "in": {
+      "anim": "reveal",
+      "dur": 0.35
+     }
+    },
+    {
+     "text": "real footage. no slideshows.",
+     "font": "JetBrainsMono-800",
+     "size": 46,
+     "y": 0.77,
+     "color": "#b6ff3b",
+     "start": "4b",
+     "in": {
+      "anim": "typewriter"
+     },
+     "stroke": 4,
+     "stroke_color": "#000000"
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/mixing.mp4",
+   "in": 1.0,
+   "beats": 8,
+   "transition": {
+    "type": "zoom",
+    "dur": 0.25
+   },
+   "camera": "pulse",
+   "camera_amount": 0.08,
+   "grade": "vivid",
+   "effects": [
+    "beat-flash",
+    "vignette"
+   ],
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.42,
+     "props": {
+      "number": 4,
+      "label": "Cuts on the beat",
+      "accent": "#22e4ff",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "text": "ON",
+     "font": "Bungee",
+     "size": 200,
+     "x": 0.2,
+     "y": 0.58,
+     "color": "#ffffff",
+     "glow": "#22e4ff",
+     "start": "2b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.25
+     }
+    },
+    {
+     "text": "THE",
+     "font": "Bungee",
+     "size": 200,
+     "x": 0.46,
+     "y": 0.58,
+     "color": "#ffffff",
+     "glow": "#ff2bd6",
+     "start": "3b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.25
+     }
+    },
+    {
+     "text": "BEAT.",
+     "font": "Bungee",
+     "size": 200,
+     "x": 0.78,
+     "y": 0.58,
+     "color": "#ffe53b",
+     "glow": "#ff2bd6",
+     "start": "4b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.25
+     },
+     "beat_bounce": 0.05
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/timeline2.mp4",
+   "in": 2.0,
+   "beats": 8,
+   "transition": {
+    "type": "slide-up",
+    "dur": 0.25
+   },
+   "camera": "drift",
+   "grade": "dark",
+   "effects": [
+    "vignette"
+   ],
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.46,
+     "props": {
+      "number": 5,
+      "label": "Builds the motion graphics",
+      "accent": "#b6ff3b",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "type": "image",
+     "src": "assets/pack_shot.jpg",
+     "cutout": "flat",
+     "outline": [
+      12,
+      "#ffffff"
+     ],
+     "drop_shadow": true,
+     "h": 0.6,
+     "x": 0.27,
+     "y": 0.6,
+     "rotate": -7,
+     "start": "1b",
+     "in": {
+      "anim": "elastic",
+      "dur": 0.45
+     },
+     "float": 8
+    },
+    {
+     "type": "block",
+     "block": "counter",
+     "x": 0.72,
+     "y": 0.42,
+     "w": 0.34,
+     "start": "3b",
+     "props": {
+      "value": 16,
+      "suffix": "M",
+      "label": "colors",
+      "color": "#22e4ff",
+      "font": "Bungee"
+     }
+    },
+    {
+     "type": "block",
+     "block": "cta",
+     "x": 0.72,
+     "y": 0.75,
+     "w": 0.32,
+     "start": "5b",
+     "in": "pop",
+     "props": {
+      "label": "Shop now",
+      "accent": "#ffe53b",
+      "font": "SpaceGrotesk-700"
+     }
+    }
+   ]
+  },
+  {
+   "type": "image",
+   "src": "assets/hero_on_purple.png",
+   "beats": 8,
+   "transition": {
+    "type": "diagonal",
+    "dur": 0.3
+   },
+   "camera": "push-in",
+   "camera_amount": 0.07,
+   "overlay": {
+    "type": "sparkles",
+    "amount": 0.8
+   },
+   "layers": [
+    {
+     "text": "GLOW",
+     "font": "Bungee",
+     "size": 480,
+     "y": 0.3,
+     "color": "#ffe53b",
+     "behind_subject": true,
+     "in": {
+      "anim": "zoom-out",
+      "dur": 0.4
+     }
+    },
+    {
+     "text": "text behind anything",
+     "font": "JetBrainsMono-800",
+     "size": 50,
+     "y": 0.08,
+     "color": "#ffffff",
+     "start": "2b",
+     "in": {
+      "anim": "typewriter"
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/rgb_keyboard.mp4",
+   "in": 2.0,
+   "beats": 8,
+   "transition": {
+    "type": "glitch",
+    "dur": 0.2
+   },
+   "camera": "push-in",
+   "grade": "vivid",
+   "effects": [
+    "vignette",
+    {
+     "type": "grain",
+     "amount": 0.5
+    }
+   ],
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.44,
+     "props": {
+      "number": 6,
+      "label": "Checks its own work",
+      "accent": "#ff2bd6",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "type": "block",
+     "block": "checklist",
+     "x": 0.7,
+     "y": 0.56,
+     "w": 0.4,
+     "start": "1b",
+     "props": {
+      "title": "Preflight",
+      "items": [
+       "Hook on frame 0",
+       "Facts match the listing",
+       "Safe zones clear",
+       "B-roll carries the cut"
+      ],
+      "every": 0.43,
+      "theme": "dark",
+      "accent": "#b6ff3b",
+      "font": "SpaceGrotesk-700"
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/lens2.mp4",
+   "in": 1.0,
+   "beats": 8,
+   "transition": {
+    "type": "flash",
+    "dur": 0.15
+   },
+   "camera": "push-in",
+   "camera_amount": 0.18,
+   "grade": "cool",
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "x": 0.04,
+     "y": 0.13,
+     "anchor": "w",
+     "w": 0.44,
+     "props": {
+      "number": 7,
+      "label": "Renders, checks, delivers",
+      "accent": "#0d0221",
+      "card": true,
+      "font": "SpaceGrotesk-700"
+     }
+    },
+    {
+     "type": "block",
+     "block": "progress",
+     "x": 0.5,
+     "y": 0.86,
+     "w": 0.62,
+     "start": "1b",
+     "props": {
+      "label": "Rendering",
+      "value": 100,
+      "fill_time": 2.4,
+      "accent": "#ff2bd6",
+      "font": "SpaceGrotesk-700"
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "broll/strobe.mp4",
+   "in": 9.0,
+   "speed": 1.5,
+   "beats": 8,
+   "grade": "vivid",
+   "effects": [
+    "beat-flash",
+    "chromatic"
+   ],
+   "layers": [
+    {
+     "text": "READY?",
+     "font": "Bungee",
+     "size": 280,
+     "y": 0.5,
+     "color": "#ffffff",
+     "glow": "#22e4ff",
+     "glow_radius": 30,
+     "end": "4b",
+     "in": {
+      "anim": "letters",
+      "dur": 0.4
+     },
+     "out": "blur"
+    },
+    {
+     "text": "HERE'S YOUR VIDEO",
+     "font": "Bungee",
+     "size": 170,
+     "y": 0.5,
+     "color": "#ffe53b",
+     "glow": "#ff2bd6",
+     "glow_radius": 26,
+     "start": "4b",
+     "in": {
+      "anim": "shake",
+      "dur": 0.3
+     }
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "src": "assets/phone_demo.mp4",
+   "in": 0,
+   "beats": 20,
+   "transition": {
+    "type": "light-leak",
+    "dur": 0.5
+   },
+   "overlay": {
+    "type": "light-sweep",
+    "amount": 0.35
+   },
+   "layers": [
+    {
+     "text": "you typed",
+     "font": "JetBrainsMono-800",
+     "size": 50,
+     "x": 0.31,
+     "y": 0.27,
+     "color": "#b6ff3b",
+     "case": "upper",
+     "tracking": 4,
+     "in": "fade"
+    },
+    {
+     "text": "B09V366BDY",
+     "font": "Bungee",
+     "size": 118,
+     "x": 0.31,
+     "y": 0.39,
+     "color": "#ffffff",
+     "glow": "#ff2bd6",
+     "start": "1b",
+     "in": {
+      "anim": "typewriter"
+     }
+    },
+    {
+     "text": "it made this.",
+     "font": "Bungee",
+     "size": 104,
+     "x": 0.31,
+     "y": 0.6,
+     "color": "#ffe53b",
+     "stroke": 6,
+     "stroke_color": "#0d0221",
+     "start": "7b",
+     "in": {
+      "anim": "elastic",
+      "dur": 0.45
+     }
+    },
+    {
+     "text": "27 s  |  9:16  |  b-roll  |  music  |  motion",
+     "font": "JetBrainsMono-800",
+     "size": 34,
+     "x": 0.31,
+     "y": 0.73,
+     "color": "#ffffff",
+     "start": "11b",
+     "in": {
+      "anim": "fade",
+      "dur": 0.4
+     }
+    }
+   ]
+  },
+  {
+   "type": "gradient",
+   "colors": [
+    "#0d0221",
+    "#7209b7",
+    "#ff2bd6",
+    "#22e4ff"
+   ],
+   "angle": 130,
+   "spin": 14,
+   "beats": 12,
+   "transition": {
+    "type": "flash",
+    "dur": 0.2
+   },
+   "overlay": {
+    "type": "confetti",
+    "amount": 0.85
+   },
+   "layers": [
+    {
+     "text": "RIFFUMI",
+     "font": "Bungee",
+     "size": 128,
+     "y": 0.34,
+     "color": "#ffffff",
+     "stroke": 8,
+     "stroke_color": "#0d0221",
+     "in": {
+      "anim": "tracking",
+      "dur": 0.5
+     }
+    },
+    {
+     "text": "Give it an ASIN. Get a video.",
+     "font": "SpaceGrotesk-700",
+     "size": 74,
+     "y": 0.5,
+     "color": "#ffffff",
+     "start": "2b",
+     "in": {
+      "anim": "stagger"
+     },
+     "shadow": [
+      0,
+      4,
+      10,
+      "#000000aa"
+     ]
+    },
+    {
+     "type": "block",
+     "block": "cta",
+     "y": 0.7,
+     "w": 0.34,
+     "start": "4b",
+     "in": "pop",
+     "props": {
+      "label": "Install the skill",
+      "accent": "#ffe53b",
+      "font": "SpaceGrotesk-700"
+     }
+    }
+   ]
+  }
+ ]
+}

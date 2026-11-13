@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""Report what this machine can do for video work, so the agent picks the right route.
+
+    python3 check_env.py            # human summary
+    python3 check_env.py --json
+
+Checks: ffmpeg/ffprobe (and key filters), Python libs (numpy, Pillow required;
+OpenCV, rembg, faster-whisper optional), installed fonts, the skill's fonts/
+folder, CPU count, and whether common asset hosts answer (stock video, music,
+fonts). Network checks are quick HEAD requests and never download anything.
+
+The result is also written to ENV_FILE (.riffumi_env.json in the working
+directory) so preflight.py knows whether this host is offline and can relax
+the font and b-roll requirements instead of failing every bold cut.
+"""
+import argparse
+import importlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import urllib.request
+
+ENV_FILE = ".riffumi_env.json"
+
+HOSTS = {
+    "pexels_api": "https://api.pexels.com/videos/search?query=test&per_page=1",
+    "pexels_files": "https://videos.pexels.com/",
+    "pixabay_api": "https://pixabay.com/api/videos/?q=test",
+    "mixkit": "https://mixkit.co/",
+    "mixkit_assets": "https://assets.mixkit.co/",
+    "archive_org": "https://archive.org/",
+    "google_fonts_css": "https://fonts.googleapis.com/css2?family=Anton",
+    "github_raw": "https://raw.githubusercontent.com/",
+    "pypi": "https://pypi.org/simple/",
+}
+
+
+def ping(url):
+    try:
+        req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=8) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        return e.code
+    except Exception:
+        return None
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--no-net", action="store_true")
+    a = ap.parse_args()
+    r = {"python": sys.version.split()[0], "cpus": os.cpu_count()}
+    r["ffmpeg"] = bool(shutil.which("ffmpeg")) and bool(shutil.which("ffprobe"))
+    if r["ffmpeg"]:
+        v = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout.split("\n")[0]
+        r["ffmpeg_version"] = v
+        f = subprocess.run(["ffmpeg", "-hide_banner", "-filters"], capture_output=True, text=True).stdout
+        r["ffmpeg_filters"] = {k: (f" {k} " in f) for k in ("loudnorm", "sidechaincompress", "vidstabdetect",
+                                                           "deshake", "xfade", "subtitles", "drawtext")}
+        enc = subprocess.run(["ffmpeg", "-hide_banner", "-encoders"], capture_output=True, text=True).stdout
+        r["encoders"] = {k: (k in enc) for k in ("libx264", "libx265", "libvpx-vp9", "aac", "libmp3lame")}
+    libs = {}
+    for m in ("numpy", "PIL", "cv2", "scipy", "rembg", "onnxruntime", "faster_whisper", "whisper"):
+        try:
+            importlib.import_module(m)
+            libs[m] = True
+        except Exception:
+            libs[m] = False
+    r["python_libs"] = libs
+    fonts = []
+    if shutil.which("fc-list"):
+        out = subprocess.run(["fc-list", ":", "family"], capture_output=True, text=True).stdout
+        fonts = sorted({x.split(",")[0].strip() for x in out.splitlines() if x.strip()})
+    r["system_font_families"] = len(fonts)
+    r["system_fonts_sample"] = fonts[:40]
+    fd = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fonts")
+    r["skill_fonts"] = sorted(f for f in os.listdir(fd) if f.lower().endswith((".ttf", ".otf"))) if os.path.isdir(fd) else []
+    if not a.no_net:
+        r["network"] = {k: ping(u) for k, u in HOSTS.items()}
+    kp = os.path.expanduser("~/.config/riffumi/keys.json")
+    kf = {}
+    if os.path.isfile(kp):
+        try:
+            kf = {k.lower(): bool(v) for k, v in json.load(open(kp)).items()}
+        except Exception:
+            pass
+    r["stock_api_keys"] = {p: bool(os.environ.get(p.upper() + "_API_KEY")) or kf.get(p, False)
+                           for p in ("pexels", "pixabay")}
+    ready = r["ffmpeg"] and libs["numpy"] and libs["PIL"]
+    r["can_render"] = bool(ready)
+    net = r.get("network", {})
+    # Offline = no asset host answered at all (sandboxes with no egress).
+    # Fonts and stock b-roll are then out of reach; preflight relaxes them.
+    r["online"] = any(v is not None for v in net.values()) if net else None
+    r["fonts_reachable"] = net.get("google_fonts_css") == 200 if net else None
+    r["stock_reachable"] = bool(net) and (net.get("pexels_api") in (200, 401) or
+                                          net.get("pixabay_api") in (200, 400))
+    missing = [m for m in ("numpy", "PIL") if not libs[m]]
+    if ready:
+        r["route"] = "code: render locally with scripts/render.py"
+    elif r["ffmpeg"] and missing:
+        r["route"] = ("almost: run python3 scripts/setup.py to install " + " and ".join(missing) +
+                      ", then render locally with scripts/render.py")
+    else:
+        r["route"] = ("no local render: install ffmpeg + numpy + Pillow (python3 scripts/setup.py prints "
+                      "the commands), or use a connected video tool / generation model, or the hosted "
+                      "Riffumi connector at riffumi.com")
+    try:
+        with open(ENV_FILE, "w") as fh:
+            json.dump(r, fh, indent=1)
+    except OSError:
+        pass
+    if a.json:
+        print(json.dumps(r, indent=1))
+        return
+    print(f"Python {r['python']}  CPUs {r['cpus']}")
+    print(f"ffmpeg: {'yes' if r['ffmpeg'] else 'NO'}  {r.get('ffmpeg_version', '')}")
+    if r["ffmpeg"]:
+        print("  filters: " + ", ".join(f"{k}={'y' if v else 'n'}" for k, v in r["ffmpeg_filters"].items()))
+    print("libs: " + ", ".join(f"{k}={'y' if v else 'n'}" for k, v in libs.items()))
+    print(f"fonts: {r['system_font_families']} system families, {len(r['skill_fonts'])} in skill fonts/")
+    if "network" in r:
+        print("network: " + ", ".join(f"{k}={v}" for k, v in r["network"].items()))
+    print("stock API keys: " + ", ".join(f"{k}={'set' if v else 'missing'}" for k, v in r["stock_api_keys"].items()))
+    if r.get("online") is False:
+        print("offline: no asset host answers from here. Fonts and stock b-roll cannot be fetched; preflight "
+              "treats those two rows as warnings. Use the user's own files, system fonts and generated shots.")
+    elif not any(r["stock_api_keys"].values()):
+        print("  -> b-roll search needs a free Pexels key (pexels.com/api) as PEXELS_API_KEY; ask the user for one")
+    print("route: " + r["route"])
+    print(f"(saved to {ENV_FILE} for preflight.py)")
+
+
+if __name__ == "__main__":
+    main()

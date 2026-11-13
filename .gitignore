@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+.riffumi_env.json
+riffumi/fonts/*.ttf
+riffumi/fonts/*.otf

@@ -1,0 +1,7 @@
+numpy
+pillow
+# optional, see scripts/setup.py --extras
+# scipy
+# rembg
+# onnxruntime
+# faster-whisper
