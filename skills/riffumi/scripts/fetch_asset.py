@@ -57,16 +57,20 @@ def resolve_pexels(pid, max_res):
     except Exception as e:
         raise RuntimeError(f"pexels: could not reach the download link for clip {pid}: {e}")
     if max_res and max_res > 0:
-        m = re.search(r"-(uhd|hd|sd)_(\d+)_(\d+)_(\d+fps)\.mp4$", final)
+        # Two naming styles on videos.pexels.com: "<id>-uhd_3840_2160_25fps.mp4" (older) and
+        # "<fileid>_2160_3840_30fps.mp4" (newer, no quality tag). Both expose the size.
+        m = re.search(r"(-(?:uhd|hd|sd))?_(\d+)_(\d+)_(\d+fps)\.mp4$", final)
         if m and min(int(m.group(2)), int(m.group(3))) > max_res:
             w, h = int(m.group(2)), int(m.group(3))
             portrait = h > w
+            tagged = bool(m.group(1))
             for tag, long_side in (("hd", 1920), ("hd", 1280), ("sd", 960)):
                 short = {1920: 1080, 1280: 720, 960: 540}[long_side]
                 if short > max_res:
                     continue
                 size = f"{short}_{long_side}" if portrait else f"{long_side}_{short}"
-                cand = final[:m.start()] + f"-{tag}_{size}_{m.group(4)}.mp4"
+                prefix = f"-{tag}_" if tagged else "_"
+                cand = final[:m.start()] + f"{prefix}{size}_{m.group(4)}.mp4"
                 try:
                     with urllib.request.urlopen(urllib.request.Request(cand, method="HEAD",
                                                                        headers={"User-Agent": UA}),

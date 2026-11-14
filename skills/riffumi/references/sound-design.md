@@ -16,7 +16,11 @@ Silent video loses viewers. Music is part of the first cut, not a finishing touc
 Never use commercial songs, a trending sound you do not have rights to, or a track "found on
 YouTube". Do not synthesise beeps as a stand-in for music; if no suitable track can be had,
 say so and offer the cut without music or with the user's file. Record source and licence of
-every track (`fetch_asset.py` writes `assets/manifest.json`).
+every track: download it with `fetch_asset.py --kind music` (which writes the manifest entry),
+not with a bare fetch. Audition at most three tracks per video, shortlisted from the library's
+own listing by mood, bpm and length; twenty downloads to pick one is not a method. Credits in
+the delivery note come from the manifest, so a track that is not in it is a track you cannot
+account for.
 
 **Choosing**: match tempo and energy to the cut (120-150 BPM for energetic social, 80-100 for
 lifestyle, ambient/piano for memory and premium). Check the length covers the video, with a

@@ -132,8 +132,11 @@ other two after the preview.
    `python3 scripts/compose.py split|phone|field|still ...` (see `--help`).
 5. **Fonts**: two families picked for the concept (`references/motion-and-type.md` pairings, or the
    brand's): `python3 scripts/get_fonts.py "Bungee" "Space Grotesk:700"`.
-6. **Music**: the user's track or a licence-clear one matched on energy and length; then
-   `python3 scripts/beats.py track.mp3` for bpm, offset and the drop (`references/sound-design.md`).
+6. **Music**: the user's track or a licence-clear one matched on energy and length. Shortlist
+   from the library's listing (tags, bpm, length) and audition at most three; download the keeper
+   with `python3 scripts/fetch_asset.py <url> --to music --kind music --source mixkit --license
+   "Mixkit Music License"` so it is in the manifest with the clips. Then
+   `python3 scripts/beats.py music/track.mp3` for bpm, offset and the drop (`references/sound-design.md`).
 
 ## 5. Plan the cut - REQUIRED: the director's worksheet
 
