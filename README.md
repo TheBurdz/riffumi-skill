@@ -77,4 +77,4 @@ python3 build.py            # dist/riffumi-skill.zip (skill folder) and dist/rif
 
 ## Reporting problems
 
-Open an issue here, or email support@riffumi.com.
+Open an issue here, or email support@riffumi.com. News and examples: [@riffumiHQ on X](https://x.com/riffumiHQ).
