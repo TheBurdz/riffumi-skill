@@ -10,7 +10,7 @@
       "name": "riffumi-skill",
       "source": "./",
       "description": "Turns the user's own clips and photos into finished videos: plan, b-roll, type, cut on the music, render locally with ffmpeg.",
-      "version": "1.1.6"
+      "version": "1.1.7"
     }
   ]
 }

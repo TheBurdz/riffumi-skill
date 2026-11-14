@@ -9,7 +9,7 @@
     python3 fetch_asset.py https://www.pexels.com/video/a-woman-pouring-coffee-3209828/ --to broll
 
 A Pexels reference needs no key: the script follows the clip's public "Free download" link
-(the one the site's own button uses), fills in source, licence and page, and tries the 1080p
+(the one the site's own button uses), fills in source, licence and page, and asks the link for the 1080p
 rendition first (--max-res 1080) before falling back to the original, usually 4K.
 
 Writes the file and appends an entry to assets/manifest.json:
@@ -43,42 +43,44 @@ def pexels_id(text):
     return m.group(1) if m else None
 
 
+def _head_final(url):
+    req = urllib.request.Request(url, method="HEAD", headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.geturl(), r.status
+
+
 def resolve_pexels(pid, max_res):
-    """Follow the public download link to the file URL; prefer the largest rendition whose
-    short edge is at most max_res (1080 = 1080p) when Pexels publishes one under the usual naming."""
-    req = urllib.request.Request(f"{PEXELS_SITE}/download/video/{int(pid)}/", method="HEAD",
-                                 headers={"User-Agent": UA})
+    """Follow the public download link to the file URL. The link takes ?w=&h= and answers with
+    the rendition of that size (checked 2026-11-14), so when the original's short edge is above
+    max_res (1080 = 1080p) ask for the 1080p rendition in the clip's own orientation; fall back
+    to the original when Pexels has no such rendition."""
+    base = f"{PEXELS_SITE}/download/video/{int(pid)}/"
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            final = r.geturl()
+        final, _ = _head_final(base)
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"pexels: HTTP {e.code} for clip {pid}. Check the id on pexels.com, or ask the "
                            f"user to paste the clip's Free download link.")
     except Exception as e:
         raise RuntimeError(f"pexels: could not reach the download link for clip {pid}: {e}")
-    if max_res and max_res > 0:
-        # Two naming styles on videos.pexels.com: "<id>-uhd_3840_2160_25fps.mp4" (older) and
-        # "<fileid>_2160_3840_30fps.mp4" (newer, no quality tag). Both expose the size.
-        m = re.search(r"(-(?:uhd|hd|sd))?_(\d+)_(\d+)_(\d+fps)\.mp4$", final)
-        if m and min(int(m.group(2)), int(m.group(3))) > max_res:
-            w, h = int(m.group(2)), int(m.group(3))
-            portrait = h > w
-            tagged = bool(m.group(1))
-            for tag, long_side in (("hd", 1920), ("hd", 1280), ("sd", 960)):
-                short = {1920: 1080, 1280: 720, 960: 540}[long_side]
-                if short > max_res:
-                    continue
-                size = f"{short}_{long_side}" if portrait else f"{long_side}_{short}"
-                prefix = f"-{tag}_" if tagged else "_"
-                cand = final[:m.start()] + f"{prefix}{size}_{m.group(4)}.mp4"
-                try:
-                    with urllib.request.urlopen(urllib.request.Request(cand, method="HEAD",
-                                                                       headers={"User-Agent": UA}),
-                                                timeout=30) as r2:
-                        if r2.status == 200:
-                            return cand
-                except Exception:
-                    continue
+    if not max_res or max_res <= 0:
+        return final
+    m = re.search(r"_(\d+)_(\d+)_(\d+)fps\.mp4$", final)
+    if not m:
+        return final
+    w, h = int(m.group(1)), int(m.group(2))
+    if min(w, h) <= max_res:
+        return final
+    portrait = h > w
+    for short, long_side in ((1080, 1920), (720, 1280)):
+        if short > max_res:
+            continue
+        q = f"?h={long_side}&w={short}" if portrait else f"?h={short}&w={long_side}"
+        try:
+            cand, status = _head_final(base + q)
+            if status == 200 and cand.endswith(".mp4") and cand != final:
+                return cand
+        except Exception:
+            continue
     return final
 
 
