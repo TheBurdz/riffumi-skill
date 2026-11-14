@@ -20,7 +20,7 @@ available, tell the user in one line, and keep the same creative standard on eve
 
 | Situation | Route |
 |---|---|
-| Code available | Plan here, render with `render.py`. B-roll from `stock_search.py` (Pexels/Pixabay API) first, generation for beats stock cannot cover, composites with `compose.py`. |
+| Code available | Plan here, render with `render.py`. B-roll from `stock_search.py` (pexels.com, no key) first, generation for beats stock cannot cover, composites with `compose.py`. |
 | No code, video generation available | Generate shots per beat, then assemble in the generator's editor or a connected tool; if neither can cut, deliver the shots plus an edit list. |
 | No code, a connected editor available | Build in that tool following its own guide; carry over concept, beat sheet, text, music and checks. |
 | Image generation only | Generate stills per beat and deliver them with the edit spec (or a slideshow the tool can export). |

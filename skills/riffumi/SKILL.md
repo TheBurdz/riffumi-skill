@@ -55,8 +55,7 @@ Safe level (brand-locked, calm) treats these as advice.
 
 ## 1. Find out what you can do here
 
-Run `python3 scripts/check_env.py`. It reports ffmpeg, libraries, fonts, network and whether a
-stock API key is set, and saves the result to `.riffumi_env.json` for `preflight.py`. If it says
+Run `python3 scripts/check_env.py`. It reports ffmpeg, libraries, fonts and network, and saves the result to `.riffumi_env.json` for `preflight.py`. If it says
 numpy or Pillow are missing, run `python3 scripts/setup.py` (it installs them for this Python and
 prints the ffmpeg command for this platform), then check again.
 
@@ -74,9 +73,11 @@ network). Fonts and stock b-roll are then out of reach: use installed fonts and 
 files, composites and generated shots, and preflight treats the font and footage rows as warnings
 instead of failures. Say so to the user in one line.
 
-**B-roll needs a stock API key.** If `stock API keys` shows none, ask the user once for a free
-Pexels key (pexels.com/api, takes two minutes) and set `PEXELS_API_KEY`. Do not scrape stock
-sites or work around their bot protection.
+**B-roll needs no key.** `stock_search.py` builds pexels.com search pages with the site's own
+filters; you read them with your own web tools, pick clips, and the script downloads the picks
+through the public download link. If the user hands you a Pexels or Pixabay API key, pass it as
+`--pexels-key` / `--pixabay-key` and the script uses the APIs instead. Do not scrape stock sites
+or work around their bot protection.
 
 ## 2. Brief
 
@@ -112,14 +113,19 @@ other two after the preview.
    "neon bedroom night", "hands typing laptop dark", "friends dancing living room party"), 1-2
    alternates, and the minimum seconds. Then:
    ```bash
-   python3 scripts/stock_search.py --plan broll_plan.json --orientation portrait --sheet broll_sheet.jpg --out broll.json
+   python3 scripts/stock_search.py --plan broll_plan.json --out broll.json
    ```
-   It asks the API for 15 results per phrase, ranks them (orientation, length, resolution) and keeps
-   the best 6 per beat on one contact sheet. **Look at the sheet** and choose one clip per beat plus a
-   backup, by content, light and motion (reject logos, wrong vibe, static shots). Then
-   `python3 scripts/stock_search.py --pick broll.json --choose hook:2,problem:1,payoff:4 --to broll`.
-   If a beat has nothing good, try two new phrases; then generate the shot; never drop it to a still.
-   Rules, licences, fallbacks: `references/assets-and-licensing.md`.
+   It prints one pexels.com search page per beat, filtered to the orientation and minimum length
+   (add `"people": "none"` to a beat for product and place shots with nobody in them). **Open each
+   search page with your own web tool**, then the two or three clip pages that look right: they
+   show the creator, duration, dimensions and a thumbnail. Choose one clip per beat plus a backup
+   by content, light and motion (reject logos, wrong vibe, static shots), never by title alone. Then
+   `python3 scripts/stock_search.py --get "hook=pexels:<id>@<creator>,problem=pexels:<id>@<creator>" --to broll --sheet broll_sheet.jpg`
+   downloads the picks through the public download link and lays them on one sheet. **Look at the
+   sheet** and swap anything that does not match for its backup. If a beat has nothing good, try two
+   new phrases; then generate the shot; never drop it to a still. With an API key from the user,
+   add `--pexels-key` and the script searches, ranks and sheets candidates itself (`--pick` to
+   download). Rules, licences, fallbacks: `references/assets-and-licensing.md`.
 3. **Product shots** become cutouts, stickers and text-behind shots:
    `python3 scripts/matte.py product.jpg --out cut.png --outline 14:#ffffff --shadow`.
 4. **Composite shots** in one command each - split screens, phone reveals, product-on-colour fields:
@@ -178,18 +184,19 @@ Special workflows (talking head, screen recordings, loops, before/after, batches
 
 | Script | Use |
 |---|---|
-| `check_env.py` | What this machine can do (ffmpeg, libs, fonts, network, stock API keys); writes `.riffumi_env.json` |
+| `check_env.py` | What this machine can do (ffmpeg, libs, fonts, network); writes `.riffumi_env.json` |
 | `setup.py` | Installs numpy and Pillow for this Python; prints the ffmpeg install command (`--extras` adds the optional packages) |
 | `inspect_media.py` | Contact sheets + inventory of clips and photos |
-| `stock_search.py` | B-roll through the Pexels/Pixabay APIs: per-beat search, ranking, contact sheet, download with licence log |
+| `stock_search.py` | B-roll from pexels.com with no key: per-beat search pages for your web tool, `--get` downloads the picks and sheets them; APIs when given a key |
 | `compose.py` | Composite shots: split screen, phone reveal, product on colour field, still to clip |
 | `beats.py` | Tempo, beat grid, drop, loudness curve of a track |
 | `matte.py` | Cut a subject out of a still; sticker outline and shadow |
 | `get_fonts.py` | Fetch open-licence fonts into `fonts/` |
-| `fetch_asset.py` | Download any file the user may use and log its licence |
+| `fetch_asset.py` | Download any file the user may use and log its licence; `pexels:<id>` needs no key |
 | `transcribe.py` | Word timings for captions and talking-head cuts (needs a whisper package) |
 | `preflight.py` | Checks a spec: files, length, platform, claims, b-roll share, production bar score; `--offline` relaxes fonts and b-roll |
 | `render.py` | Renders a spec: stills, contact sheets, previews, finals, single-scene re-renders |
 
 Requirements: Python 3.8+, `numpy`, `Pillow`, `ffmpeg`. Optional: `scipy` (faster mattes), `rembg`
-(cutouts from busy photos), `faster-whisper` (transcripts). Free Pexels or Pixabay API key for b-roll.
+(cutouts from busy photos), `faster-whisper` (transcripts). No API keys: b-roll comes from pexels.com
+through your own web tools and the public download link.

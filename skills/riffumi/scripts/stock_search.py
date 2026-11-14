@@ -1,37 +1,40 @@
 #!/usr/bin/env python3
-"""Find b-roll through the official stock APIs, rank it, and show candidates as one contact sheet.
+"""Find b-roll on pexels.com without any key, or through the stock APIs when the user hands you one.
 
-    # one beat
-    python3 stock_search.py "hands pouring coffee" --orientation portrait --min-seconds 3 --sheet c.jpg
+Default route (no key): the script builds the pexels.com search page for each beat, with the
+site's own filters (orientation, minimum seconds, people count), and you open those pages with
+your own web tools, the way you would read any web page. A clip page (/video/<slug>-<id>/) shows
+the creator, duration, dimensions and a thumbnail. Pick one clip per beat plus a backup, then let
+the script download the picks through the public "Free download" link and lay them out on one
+contact sheet so you can check them before they go in the cut.
 
-    # a whole video: one search per beat, one sheet, one JSON
-    python3 stock_search.py --plan broll_plan.json --sheet broll_candidates.jpg --out broll_candidates.json
+    # one beat: print the search URL
+    python3 stock_search.py "hands pouring coffee" --orientation portrait --min-seconds 3
 
-    # download the picks (logs licence + creator to <to>/manifest.json)
-    python3 stock_search.py --pick broll_candidates.json --choose hook:2,problem:1,payoff:4 --to broll
+    # a whole video: one URL per beat, written to a JSON you fill in
+    python3 stock_search.py --plan broll_plan.json --out broll.json
+
+    # download the picks (beat=pexels:<id>[@Creator Name]) and build the check sheet
+    python3 stock_search.py --get "hook=pexels:3209828@Pressmaster,payoff=pexels:857195" --to broll --sheet broll_sheet.jpg
 
 broll_plan.json:
     {"orientation": "portrait", "beats": [
        {"beat": "hook",    "query": "neon bedroom night",       "alt": ["led lights dark room"], "min_seconds": 3},
-       {"beat": "problem", "query": "messy cables desk close up"},
+       {"beat": "problem", "query": "messy cables desk close up", "people": "none"},
        {"beat": "payoff",  "query": "friends dancing living room party", "min_seconds": 4}]}
 
-Providers (official APIs, free keys, no scraping, no bot checks involved):
-  pexels   PEXELS_API_KEY   https://www.pexels.com/api/   (200 requests/hour, 20,000/month)
-  pixabay  PIXABAY_API_KEY  https://pixabay.com/api/docs/
-Keys are read from the environment, or from ~/.config/riffumi/keys.json
-({"pexels": "...", "pixabay": "..."}), or --pexels-key / --pixabay-key. Keys are never printed.
+The download link https://www.pexels.com/download/video/<id>/ is the same one the site's button
+uses; it answers for any client with the clip's largest rendition. --max-res 1080 (the default)
+tries the 1080p rendition first to keep files small, and falls back to the original.
 
-Each search asks for up to --per-query results (default 15, one request), ranks them
-(orientation, length vs the beat, resolution, frame rate, not too long), and keeps the
-best --keep (default 6) per beat for the sheet. Look at the sheet, pick one clip per beat
-plus a backup, then --pick. Fifteen fetched / six shown beats "five fetched / best three":
-one request either way, and the visual check is where quality is decided.
+Keyed route (optional): pass --pexels-key or --pixabay-key and the script searches the official
+APIs instead, ranks 15 results per phrase, draws the candidates on a sheet, and --pick downloads
+your choices. Keys are only ever taken from those flags: the script never reads the environment
+or a config file for them, and never prints them. Users who want this every time can edit the
+script; the default build stays keyless on purpose.
 
-Without any key: the script says so and exits 3. Then either ask the user for a free
-Pexels key (two minutes at pexels.com/api), or have the user open the clip page in their
-own browser and paste its "Free download" link, and download it with fetch_asset.py.
-Do not scrape stock sites or work around their bot protection.
+Either way: do not scrape stock sites or work around their bot protection. Everything downloaded
+is logged in <to>/manifest.json with source, licence and creator.
 """
 import argparse
 import io
@@ -43,30 +46,17 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from vdlib import load_font  # noqa: E402
-
 UA = "riffumi-skill/1.0 (+stock_search)"
 
 
 # --------------------------------------------------------------------------- keys
 
 def get_keys(args):
+    """Keys come from the command line only (see the module docstring)."""
     keys = {}
-    p = os.path.expanduser("~/.config/riffumi/keys.json")
-    if os.path.isfile(p):
-        try:
-            with open(p) as f:
-                keys.update({k.lower(): v for k, v in json.load(f).items() if v})
-        except Exception:
-            print(f"note: could not read {p}", file=sys.stderr)
-    for prov in ("pexels", "pixabay"):
-        env = os.environ.get(prov.upper() + "_API_KEY")
-        if env:
-            keys[prov] = env
-    if args.pexels_key:
+    if getattr(args, "pexels_key", None):
         keys["pexels"] = args.pexels_key
-    if args.pixabay_key:
+    if getattr(args, "pixabay_key", None):
         keys["pixabay"] = args.pixabay_key
     return keys
 
@@ -219,6 +209,8 @@ def fetch_image(url):
 
 def make_sheet(results, path, orientation):
     from PIL import Image, ImageDraw
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from vdlib import load_font
     tw = 220 if orientation == "portrait" else 300
     th = int(tw * (16 / 9 if orientation == "portrait" else 9 / 16 if orientation == "landscape" else 1))
     cols = max((len(r["candidates"]) for r in results), default=1)
@@ -278,6 +270,121 @@ def do_pick(args):
     print(json.dumps(out, indent=1))
 
 
+# --------------------------------------------------------------------------- keyless route (pexels.com)
+
+PEXELS_SITE = "https://www.pexels.com"
+PEXELS_PEOPLE = {"none": "0", "one": "1", "two": "2", "group": "3_plus"}
+PEXELS_LICENSE = "Pexels License (free for commercial use, no attribution required)"
+
+
+def pexels_search_url(query, orientation=None, min_seconds=None, max_seconds=None, people=None,
+                      resolution=None, page=None):
+    """The pexels.com video search page with the filters the site itself uses (checked 2026-11-11):
+    orientation, min_duration/max_duration in seconds, people_count (0 = nobody in frame, the
+    product-shot filter), resolution_name (1080p or 4K)."""
+    q = " ".join((query or "").split())
+    params = []
+    if orientation in ("portrait", "landscape", "square"):
+        params.append(("orientation", orientation))
+    if min_seconds:
+        params.append(("min_duration", str(int(float(min_seconds)))))
+    if max_seconds:
+        params.append(("max_duration", str(int(float(max_seconds)))))
+    if people in PEXELS_PEOPLE:
+        params.append(("people_count", PEXELS_PEOPLE[people]))
+    if resolution and str(resolution).lower() in ("1080p", "4k"):
+        params.append(("resolution_name", "4K" if str(resolution).lower() == "4k" else "1080p"))
+    if page and int(page) > 1:
+        params.append(("page", str(int(page))))
+    url = f"{PEXELS_SITE}/search/videos/{urllib.parse.quote(q, safe='')}/"
+    return url + ("?" + urllib.parse.urlencode(params) if params else "")
+
+
+def pexels_id(text):
+    """The clip id from a pexels.com clip page, a download link, a bare id or pexels:<id>."""
+    t = (text or "").strip()
+    m = (re.search(r"pexels\.com/(?:video/(?:[a-z0-9-]*-)?|download/video/)(\d+)", t, re.I)
+         or re.fullmatch(r"(?:pexels:)?(\d+)", t, re.I))
+    return m.group(1) if m else None
+
+
+def site_route(beats, orientation, args):
+    """One search URL per beat, plus what to do with it."""
+    results = []
+    for b in beats:
+        min_s = float(b.get("min_seconds", args.min_seconds))
+        urls = [pexels_search_url(q, orientation, min_s, b.get("max_seconds"), b.get("people"),
+                                  b.get("resolution"))
+                for q in [b["query"]] + list(b.get("alt", []))]
+        results.append({"beat": b.get("beat", "beat"), "query": b["query"], "min_seconds": min_s,
+                        "search": urls[0], "alt_search": urls[1:], "pick": None, "backup": None})
+    return {
+        "route": "pexels.com (no key)",
+        "orientation": orientation,
+        "results": results,
+        "how": [
+            "Open each 'search' page with your own web tool (page fetch, web search or a browser tool).",
+            "Open the two or three clip pages that look right (/video/<slug>-<id>/): they show the creator, "
+            "duration, dimensions and a thumbnail. Judge the thumbnail and the description against the beat; "
+            "never pick by title alone.",
+            "Write the pick as pexels:<id>@<creator> into 'pick' (and one 'backup'), then run: "
+            "stock_search.py --get \"hook=pexels:<id>@<creator>,...\" --to broll --sheet broll_sheet.jpg",
+            "Filters you can add to a search URL: people_count=0 for product and place shots with nobody in "
+            "them, min_duration/max_duration in seconds, resolution_name=1080p, page=2 for more. Keep the "
+            "query to plain nouns; two or three words beat a sentence.",
+            "If pexels.com does not answer from this host: ask the user to open the search in their browser "
+            "and paste clip links, then --get works the same; or use the user's own footage, composites and "
+            "generated shots. Never scrape or work around bot protection.",
+        ],
+    }
+
+
+def parse_get(spec):
+    """'hook=pexels:123@Jane Doe,payoff=https://www.pexels.com/video/x-456/' -> [(beat, id, creator)]."""
+    out = []
+    for item in [i for i in spec.split(",") if i.strip()]:
+        beat, _, ref = item.strip().partition("=")
+        if not ref:
+            beat, ref = "beat%d" % (len(out) + 1), beat
+        ref, _, creator = ref.partition("@")
+        pid = pexels_id(ref)
+        if not pid:
+            sys.exit(f"--get: cannot read a Pexels clip id from '{ref}' (want pexels:<id> or a pexels.com link)")
+        out.append((re.sub(r"[^a-z0-9]+", "_", beat.lower()).strip("_") or "beat", pid, creator.strip()))
+    return out
+
+
+def do_get(args):
+    """Download picked Pexels clips through the public download link; sheet them for the eye check."""
+    import subprocess
+    fa = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_asset.py")
+    out = []
+    for beat, pid, creator in parse_get(args.get):
+        name = f"{beat}_pexels{pid}.mp4"
+        cmd = [sys.executable, fa, f"pexels:{pid}", "--to", args.to, "--name", name, "--kind", "broll",
+               "--max-res", str(args.max_res)]
+        if creator:
+            cmd += ["--creator", creator]
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        ok = r.returncode == 0
+        out.append({"beat": beat, "ref": f"pexels:{pid}", "file": os.path.join(args.to, name) if ok else None,
+                    "ok": ok, "error": None if ok else (r.stderr or r.stdout).strip()[:300]})
+    files = [o["file"] for o in out if o["ok"]]
+    result = {"downloaded": out}
+    if args.sheet and files:
+        im = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inspect_media.py")
+        r = subprocess.run([sys.executable, im, *files, "--out", args.sheet], capture_output=True, text=True)
+        result["sheet"] = args.sheet if r.returncode == 0 else None
+        if r.returncode != 0:
+            result["sheet_error"] = (r.stderr or r.stdout).strip()[:300]
+        else:
+            result["next"] = ("Look at the sheet: one row per clip. Keep what matches the beat by content, light "
+                              "and motion; swap anything static, off-vibe or branded for the backup.")
+    print(json.dumps(result, indent=1))
+    if not files:
+        sys.exit(2)
+
+
 # --------------------------------------------------------------------------- main
 
 def main():
@@ -286,31 +393,28 @@ def main():
     ap.add_argument("--plan", help="JSON file with one search per beat")
     ap.add_argument("--orientation", default="portrait", choices=["portrait", "landscape", "square", "any"])
     ap.add_argument("--min-seconds", type=float, default=3.0)
-    ap.add_argument("--per-query", type=int, default=15, help="results requested per search (one API call)")
-    ap.add_argument("--keep", type=int, default=6, help="best candidates kept per beat")
-    ap.add_argument("--target", type=int, default=1920, help="long side wanted for the download file")
-    ap.add_argument("--provider", help="pexels,pixabay (default: every provider with a key)")
-    ap.add_argument("--sheet", help="write a contact sheet of the candidates")
-    ap.add_argument("--out", help="write the candidates JSON here")
-    ap.add_argument("--pick", help="candidates JSON from an earlier run")
-    ap.add_argument("--choose", help="beat:number pairs, e.g. hook:2,payoff:1")
+    ap.add_argument("--people", choices=sorted(PEXELS_PEOPLE), help="people in frame (none = product shots)")
+    ap.add_argument("--out", help="write the search JSON (keyless) or the candidates JSON (keyed) here")
+    ap.add_argument("--get", help="keyless download: beat=pexels:<id>[@creator],... (ids you found on the site)")
     ap.add_argument("--to", default="broll")
-    ap.add_argument("--pexels-key")
-    ap.add_argument("--pixabay-key")
+    ap.add_argument("--sheet", help="contact sheet: of the downloads (--get) or of the API candidates (keyed)")
+    ap.add_argument("--max-res", type=int, default=1080, help="prefer the 1080p rendition when downloading (0 = original)")
+    # Keyed route only:
+    ap.add_argument("--pexels-key", help="use the Pexels API instead of the site (optional)")
+    ap.add_argument("--pixabay-key", help="use the Pixabay API as well (optional)")
+    ap.add_argument("--per-query", type=int, default=15, help="keyed: results requested per search (one API call)")
+    ap.add_argument("--keep", type=int, default=6, help="keyed: best candidates kept per beat")
+    ap.add_argument("--target", type=int, default=1920, help="keyed: long side wanted for the download file")
+    ap.add_argument("--provider", help="keyed: pexels,pixabay (default: every provider with a key)")
+    ap.add_argument("--pick", help="keyed: candidates JSON from an earlier run")
+    ap.add_argument("--choose", help="keyed: beat:number pairs, e.g. hook:2,payoff:1")
     a = ap.parse_args()
+    if a.get:
+        return do_get(a)
     if a.pick:
         if not a.choose:
             sys.exit("--pick needs --choose beat:number,...")
         return do_pick(a)
-    keys = get_keys(a)
-    if not keys:
-        print(json.dumps({"error": "no_api_key", "fix": [
-            "Ask the user for a free Pexels API key (pexels.com/api) and set PEXELS_API_KEY, or a Pixabay key "
-            "(pixabay.com/api/docs) as PIXABAY_API_KEY.",
-            "Or ask the user to open the clip pages in their own browser and paste the 'Free download' links; "
-            "download each with fetch_asset.py.",
-            "Do not scrape stock sites or work around their bot protection."]}, indent=1))
-        sys.exit(3)
     if a.plan:
         with open(a.plan) as f:
             plan = json.load(f)
@@ -318,13 +422,26 @@ def main():
         beats = plan["beats"]
     elif a.query:
         orientation = a.orientation
-        beats = [{"beat": "beat", "query": a.query}]
+        beats = [{"beat": "beat", "query": a.query, "people": a.people}]
     else:
-        sys.exit("give a query or --plan")
+        sys.exit("give a query, --plan, or --get")
+    keys = get_keys(a)
+    if not keys:
+        data = site_route(beats, orientation, a)
+        s = json.dumps(data, indent=1)
+        if a.out:
+            with open(a.out, "w") as f:
+                f.write(s)
+            print(json.dumps({"out": a.out, "route": data["route"],
+                              "searches": [{"beat": r["beat"], "search": r["search"]} for r in data["results"]],
+                              "how": data["how"]}, indent=1))
+        else:
+            print(s)
+        return
     results = [run_beat(b, keys, a, orientation, a.target) for b in beats]
     data = {"orientation": orientation, "providers": sorted(keys), "results": results,
             "next": "Look at the sheet. Pick one clip per beat (plus a backup) by content, light and motion, "
-                    "then: stock_search.py --pick <this json> --choose beat:#,beat:#"}
+                    "then: stock_search.py --pick <this json> --choose beat:#,beat:# (same keys)"}
     if a.sheet:
         data["sheet"] = make_sheet(results, a.sheet, orientation)
     s = json.dumps(data, indent=1)

@@ -1,0 +1,14 @@
+{
+  "name": "riffumi",
+  "version": "1.1.0",
+  "description": "Riffumi, the local edition: a video director your agent follows, with an ffmpeg renderer, keyless stock b-roll from pexels.com, beat sync, cutouts, composites and a production bar it measures before delivering. Turns the user's own clips and photos into finished videos.",
+  "author": {
+    "name": "The Burdz, LLC",
+    "email": "support@riffumi.com",
+    "url": "https://riffumi.com"
+  },
+  "homepage": "https://riffumi.com/skill",
+  "repository": "https://github.com/TheBurdz/riffumi-skill",
+  "license": "MIT",
+  "keywords": ["video", "video editing", "ffmpeg", "social video", "product video", "captions", "motion graphics", "b-roll"]
+}

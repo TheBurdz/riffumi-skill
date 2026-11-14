@@ -55,38 +55,45 @@ branded product.
 
 | Source | What | Licence (verify on the site) | Notes |
 |---|---|---|---|
-| Pexels | video + photos | Pexels License: free commercial use, no credit required | Largest free library. **Use the official API** (free key) - `stock_search.py`. |
-| Pixabay | video, photos, music, sfx | Pixabay Content License: free commercial use, no credit | Official API (free key) - `stock_search.py --provider pixabay`. |
+| Pexels | video + photos | Pexels License: free commercial use, no credit required | Largest free library. **No key needed**: `stock_search.py` builds the search pages, you read them, `--get` downloads through the public link. |
+| Pixabay | video, photos, music, sfx | Pixabay Content License: free commercial use, no credit | Official API when the user gives a key: `stock_search.py --pixabay-key ...`. |
 | Mixkit | video, music, sfx | Mixkit free licences (stock video, music, sfx) | Direct downloads from the site; rate-limits heavy use. |
 | Coverr | video | free commercial use | Good lifestyle b-roll; download by hand. |
 | Unsplash | photos | Unsplash License | Photos only. |
 | Videvo, Vecteezy, Storyblocks | mixed | per-file licences, some paid | Check each file. |
 
-### Getting stock clips: the API route
+### Getting stock clips: the pexels.com route (no key)
 
-The stock sites protect their web pages against automated traffic. Their **official APIs** are built
-for exactly this job, return direct download links, and need only a free key:
-
-- Pexels: create a key at pexels.com/api (instant), then `export PEXELS_API_KEY=...`
-  (or put `{"pexels": "..."}` in `~/.config/riffumi/keys.json`). 200 requests/hour, 20,000/month.
-- Pixabay: key at pixabay.com/api/docs, `export PIXABAY_API_KEY=...`.
+Pexels publishes a filtered search page and a public "Free download" link for every clip, so the
+whole route works with the web tools you already have:
 
 ```bash
-python3 scripts/stock_search.py --plan broll_plan.json --orientation portrait --sheet broll_sheet.jpg --out broll.json
-# look at broll_sheet.jpg, then:
-python3 scripts/stock_search.py --pick broll.json --choose hook:2,problem:1,payoff:4 --to broll
+python3 scripts/stock_search.py --plan broll_plan.json --out broll.json
+# open each "search" URL with your web tool; open the 2-3 clip pages that look right
+# (creator, duration, dimensions, thumbnail); choose one per beat plus a backup; then:
+python3 scripts/stock_search.py --get "hook=pexels:3209828@Pressmaster,payoff=pexels:857195@Creator" --to broll --sheet broll_sheet.jpg
 ```
 
-**How many to look at.** Each phrase is one API call that returns up to 15 clips; the script ranks
-them (orientation, length vs the beat, resolution, frame rate) and keeps the best 6 per beat on the
-sheet. Choose one per beat plus a backup. Fetching only 5 and keeping 2-3 saves nothing (it is still
-one call) and leaves too little to choose from; the visual check on the sheet is where quality is won.
-If a beat's six are weak, add two new phrases (`"alt"` in the plan) - different nouns, a different
-angle (close-up, top-down, silhouette), a different light (neon, golden hour, night).
+The search page takes the site's own filters: `orientation`, `min_duration`/`max_duration` in
+seconds, `people_count=0` for product and place shots with nobody in them, `resolution_name=1080p`,
+`page=2` for more. Keep queries to plain nouns; two or three words beat a sentence. `--get` follows
+the public download link (1080p rendition first, then the original), logs source, licence, page
+and creator in `broll/manifest.json`, and draws the downloads on one sheet for the eye check.
 
-**No key available.** Ask the user for one (it takes two minutes). Until then: the user can open
-clip pages in their own browser and paste the "Free download" links, which `fetch_asset.py`
-downloads and logs. **Never scrape the sites' pages, use proxies or work around bot protection.**
+**How many to look at.** Open enough clip pages to have a real choice: two or three per beat, one
+pick and one backup. Judge the thumbnail and the description against the beat, never the title.
+If a beat is weak, add two new phrases (`"alt"` in the plan): different nouns, a different angle
+(close-up, top-down, silhouette), a different light (neon, golden hour, night).
+
+**Keyed route (optional).** If the user hands you a Pexels or Pixabay API key, pass it as
+`--pexels-key` / `--pixabay-key`: the script searches the APIs, ranks 15 results per phrase, draws
+the candidates on a sheet, and `--pick` downloads your choices. The script takes keys only from
+those flags, never from the environment or a file.
+
+**pexels.com does not answer from this host.** Ask the user to open the search in their browser and
+paste clip links; `--get` and `fetch_asset.py` take clip pages, download links or bare ids. Or use
+the user's own footage, composites and generated shots. **Never scrape the sites' pages, use proxies
+or work around bot protection.**
 
 ### Search well
 

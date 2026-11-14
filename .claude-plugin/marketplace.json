@@ -1,0 +1,24 @@
+{
+  "name": "riffumi-skill",
+  "owner": {
+    "name": "The Burdz, LLC",
+    "email": "support@riffumi.com",
+    "url": "https://riffumi.com"
+  },
+  "metadata": {
+    "description": "Riffumi, the local edition: a video director your agent follows, with an ffmpeg renderer and keyless stock b-roll."
+  },
+  "plugins": [
+    {
+      "name": "riffumi",
+      "source": "./",
+      "description": "Turns the user's own clips and photos into finished videos: plan, b-roll, type, cut on the music, render locally with ffmpeg.",
+      "version": "1.1.0",
+      "author": {"name": "The Burdz, LLC", "url": "https://riffumi.com"},
+      "homepage": "https://riffumi.com/skill",
+      "license": "MIT",
+      "keywords": ["video", "video editing", "ffmpeg", "social video", "b-roll"],
+      "category": "productivity"
+    }
+  ]
+}

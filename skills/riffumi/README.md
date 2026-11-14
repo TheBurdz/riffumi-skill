@@ -16,7 +16,7 @@ sent to Riffumi's servers; renders happen on your machine or in your agent's san
 | Setup | sign in once, nothing to install | copy the folder, install numpy + Pillow + ffmpeg |
 | Works from | any AI app that takes MCP connectors, including the phone apps | agents that read skills or can run scripts (Claude Code, Codex, Cursor, Claude apps with code execution and others) |
 | Library and share links | yes: uploads, projects and renders kept, every render gets a link that plays in the chat | no: files live where you render them |
-| Stock b-roll, fonts, transcription | built in | free Pexels or Pixabay key for stock; fonts fetched from Google Fonts; whisper optional |
+| Stock b-roll, fonts, transcription | built in | Pexels through your agent's own web tools, no key; fonts fetched from Google Fonts; whisper optional |
 | Cost | 3 free exports, then one plan | free (MIT), you pay nothing to Riffumi |
 | Best for | phones, chat apps without code execution, teams, sharing | developers, agent builders, offline work, batch jobs, custom pipelines |
 
@@ -45,7 +45,7 @@ riffumi/
     check_env.py                what this machine can do; saves .riffumi_env.json for preflight
     setup.py                    installs numpy + Pillow for this Python, prints the ffmpeg command
     render.py                   JSON edit spec -> MP4 (stills, contact sheets, previews, finals)
-    stock_search.py             b-roll through the Pexels/Pixabay APIs, ranked, on one contact sheet
+    stock_search.py             b-roll from pexels.com with no key (search pages + public download); APIs when given a key
     compose.py                  split screens, phone reveals, product-on-colour fields
     preflight.py                checks a spec before rendering (offline-aware)
     inspect_media.py            contact sheets + inventory of your clips and photos
@@ -65,7 +65,8 @@ riffumi/
 - Python 3.8+ with `numpy` and `Pillow`: `python3 scripts/setup.py` installs them for the Python
   you run the scripts with (or `pip install -r requirements.txt`)
 - `ffmpeg` and `ffprobe` on the PATH (`setup.py` prints the command for your platform)
-- A free Pexels API key (pexels.com/api) as `PEXELS_API_KEY` for stock b-roll (Pixabay optional)
+- No API keys. Stock b-roll comes from pexels.com through the agent's own web tools and the
+  public download link; a Pexels or Pixabay key can be passed on the command line if you have one
 - Optional: `scipy` (faster cutouts), `rembg` (cutouts from busy photos),
   `faster-whisper` (transcripts for captions): `python3 scripts/setup.py --extras`
 
@@ -76,8 +77,8 @@ Check: `python3 scripts/check_env.py`, then
 
 | Host | Render | Fonts fetched | Stock b-roll | Transcripts | Status |
 |---|---|---|---|---|---|
-| Claude Code on a Mac or Linux box | yes | yes | yes, with a key | with faster-whisper | verified 2026-11-13 (macOS, ffmpeg 9, Python 3.9) |
-| Any coding agent with a shell (Codex, Cursor and similar) | yes | yes | yes, with a key | optional | expected: same requirements as above |
+| Claude Code on a Mac or Linux box | yes | yes | yes, no key (verified 2026-11-14) | with faster-whisper | verified 2026-11-13 (macOS, ffmpeg 9, Python 3.9) |
+| Any coding agent with a shell (Codex, Cursor and similar) | yes | yes | yes, no key | optional | expected: same requirements as above |
 | Claude apps with code execution | yes when ffmpeg is in the sandbox | depends on sandbox network | depends on sandbox network | no | expected; run check_env.py first |
 | ChatGPT with code execution | yes (ffmpeg, numpy and Pillow are preinstalled) | no: the sandbox has no network | no | no | expected; the skill runs offline-aware |
 | Agents without code execution | no | no | no | no | the skill still produces the concept, beat sheet and spec; render later, or use the hosted connector |

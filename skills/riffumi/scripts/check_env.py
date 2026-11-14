@@ -25,9 +25,9 @@ import urllib.request
 ENV_FILE = ".riffumi_env.json"
 
 HOSTS = {
-    "pexels_api": "https://api.pexels.com/videos/search?query=test&per_page=1",
-    "pexels_files": "https://videos.pexels.com/",
-    "pixabay_api": "https://pixabay.com/api/videos/?q=test",
+    # The public download link of one clip: a 302 to its MP4 for any client (a plain GET of the
+    # site root is bot-checked and says nothing about whether the route works).
+    "pexels_download": "https://www.pexels.com/download/video/3209828/",
     "mixkit": "https://mixkit.co/",
     "mixkit_assets": "https://assets.mixkit.co/",
     "archive_org": "https://archive.org/",
@@ -81,15 +81,9 @@ def main():
     r["skill_fonts"] = sorted(f for f in os.listdir(fd) if f.lower().endswith((".ttf", ".otf"))) if os.path.isdir(fd) else []
     if not a.no_net:
         r["network"] = {k: ping(u) for k, u in HOSTS.items()}
-    kp = os.path.expanduser("~/.config/riffumi/keys.json")
-    kf = {}
-    if os.path.isfile(kp):
-        try:
-            kf = {k.lower(): bool(v) for k, v in json.load(open(kp)).items()}
-        except Exception:
-            pass
-    r["stock_api_keys"] = {p: bool(os.environ.get(p.upper() + "_API_KEY")) or kf.get(p, False)
-                           for p in ("pexels", "pixabay")}
+    # Stock b-roll needs no key: stock_search.py builds pexels.com search pages for
+    # the agent's own web tools and downloads picks through the public download link.
+    r["stock_route"] = "pexels.com public (no key): stock_search.py --plan ... then --get"
     ready = r["ffmpeg"] and libs["numpy"] and libs["PIL"]
     r["can_render"] = bool(ready)
     net = r.get("network", {})
@@ -97,8 +91,7 @@ def main():
     # Fonts and stock b-roll are then out of reach; preflight relaxes them.
     r["online"] = any(v is not None for v in net.values()) if net else None
     r["fonts_reachable"] = net.get("google_fonts_css") == 200 if net else None
-    r["stock_reachable"] = bool(net) and (net.get("pexels_api") in (200, 401) or
-                                          net.get("pixabay_api") in (200, 400))
+    r["stock_reachable"] = bool(net) and net.get("pexels_download") in (200, 301, 302)
     missing = [m for m in ("numpy", "PIL") if not libs[m]]
     if ready:
         r["route"] = "code: render locally with scripts/render.py"
@@ -125,12 +118,13 @@ def main():
     print(f"fonts: {r['system_font_families']} system families, {len(r['skill_fonts'])} in skill fonts/")
     if "network" in r:
         print("network: " + ", ".join(f"{k}={v}" for k, v in r["network"].items()))
-    print("stock API keys: " + ", ".join(f"{k}={'set' if v else 'missing'}" for k, v in r["stock_api_keys"].items()))
+    print("stock b-roll: " + r["stock_route"])
     if r.get("online") is False:
         print("offline: no asset host answers from here. Fonts and stock b-roll cannot be fetched; preflight "
               "treats those two rows as warnings. Use the user's own files, system fonts and generated shots.")
-    elif not any(r["stock_api_keys"].values()):
-        print("  -> b-roll search needs a free Pexels key (pexels.com/api) as PEXELS_API_KEY; ask the user for one")
+    elif r.get("stock_reachable") is False:
+        print("  -> pexels.com does not answer from this host; read its pages with your own web tool, or ask "
+              "the user to paste clip links, then stock_search.py --get downloads them")
     print("route: " + r["route"])
     print(f"(saved to {ENV_FILE} for preflight.py)")
 
