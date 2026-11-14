@@ -1,5 +1,5 @@
 {
-  "name": "riffumi-skill",
+  "name": "riffumi",
   "owner": {
     "name": "The Burdz, LLC",
     "email": "support@riffumi.com",
@@ -10,14 +10,23 @@
   },
   "plugins": [
     {
-      "name": "riffumi",
+      "name": "riffumi-skill",
       "source": "./",
       "description": "Turns the user's own clips and photos into finished videos: plan, b-roll, type, cut on the music, render locally with ffmpeg.",
-      "version": "1.1.0",
-      "author": {"name": "The Burdz, LLC", "url": "https://riffumi.com"},
+      "version": "1.1.1",
+      "author": {
+        "name": "The Burdz, LLC",
+        "url": "https://riffumi.com"
+      },
       "homepage": "https://riffumi.com/skill",
       "license": "MIT",
-      "keywords": ["video", "video editing", "ffmpeg", "social video", "b-roll"],
+      "keywords": [
+        "video",
+        "video editing",
+        "ffmpeg",
+        "social video",
+        "b-roll"
+      ],
       "category": "productivity"
     }
   ]

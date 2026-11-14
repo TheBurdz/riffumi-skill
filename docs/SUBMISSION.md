@@ -73,6 +73,13 @@ Docs: https://developers.openai.com/plugins/deploy/submission,
 https://developers.openai.com/plugins/guides/submit-claude-plugin,
 https://developers.openai.com/codex/plugins/build.
 
+## Plugin slug
+
+The plugin's `name` is `riffumi-skill` (2026-11-14): the OpenAI portal keys uploads on the
+name, and `riffumi` already belongs to the rejected MCP app from October, so an archive named
+`riffumi` was treated as a new version of that app and refused. The display name is still
+`Riffumi`; the skill inside is still `riffumi`.
+
 ## Listing copy (shared)
 
 - Display name: `Riffumi`

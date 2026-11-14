@@ -22,7 +22,7 @@ Riffumi's servers and works from any AI app that takes MCP connectors, phones in
 
   ```
   /plugin marketplace add TheBurdz/riffumi-skill
-  /plugin install riffumi@riffumi-skill
+  /plugin install riffumi-skill@riffumi
   ```
 - **As a bare skill**: download `riffumi-skill.zip` from the
   [releases](https://github.com/TheBurdz/riffumi-skill/releases) or from
