@@ -47,6 +47,14 @@ https://support.claude.com/en/articles/13145358-anthropic-software-directory-pol
 
 ## OpenAI plugin directory (ChatGPT and Codex)
 
+**2026-11-14: the portal answered "We are not accepting more skills-only submissions at this
+time."** The upload itself works (slug `riffumi-skill`, subtitle under 30 characters), so retry
+the same archive when the pause lifts. Until then the repo marketplace at
+`.agents/plugins/marketplace.json` lets Codex and ChatGPT desktop users install without review:
+`codex plugin marketplace add TheBurdz/riffumi-skill`. The other door into the OpenAI directory
+is "With MCP", which brings back the MCP review (explicit annotations, one tool per operation,
+test cases, demo video) that the connector failed in October.
+
 Portal: https://platform.openai.com/plugins (the organisation that holds the verified identity;
 the plugin publishes under that verified name, so either complete business verification for
 The Burdz, LLC first or set `author.name` and `developerName` to the verified individual's

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "riffumi-skill",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Riffumi, the local edition: a video director your agent follows, with an ffmpeg renderer, keyless stock b-roll from pexels.com, beat sync, cutouts, composites and a production bar it measures before delivering. Turns the user's own clips and photos into finished videos.",
   "author": {
     "name": "The Burdz, LLC",
@@ -25,7 +25,7 @@
     "com.openai": {
       "interface": {
         "displayName": "Riffumi",
-        "shortDescription": "Direct videos from your own clips",
+        "shortDescription": "Direct videos from your clips",
         "longDescription": "Riffumi is a video director your agent follows. Bring clips and photos, say what the video is for, and the agent plans the cut, writes three concepts and scores them, gathers b-roll, sets the type and the look, cuts on the music and renders a finished MP4 on the machine where it runs.\n\nWhat you can make: product showcases, social posts for every aspect ratio, stories, ads, tutorials and setup demos, talking-head cuts with captions, and quick highlight reels from a folder of clips. Riffumi works from the media you give it. It does not generate footage; it edits yours. When a beat needs context shots, the agent searches free stock b-roll on pexels.com with its own web tools and brings the clip in through the site's public download link, with the licence and creator logged. No API keys.\n\nHow it works: the agent runs the included Python scripts. A setup script installs the two Python packages it needs (numpy and Pillow) and prints the ffmpeg command for the platform; an environment check reports what the machine can do and whether it is online; a preflight scores every edit spec against a production bar (an idea before a look, moving footage carrying the video, cuts on the music, only true words on screen) before anything is rendered. Offline hosts are detected and the bar relaxes the rows that need the network.\n\nIncluded: the director's playbook (SKILL.md), eleven references (creative system, scene recipes, motion and type, sound design, formats and platforms, assets and licensing, honesty rules, review checklist), and twelve scripts: render, preflight, stock search, media inspection, compose, matte, beats, fonts, transcription, setup and environment check.\n\nNeeds: a shell with Python 3.8 or newer and ffmpeg. No account, no key, nothing sent to Riffumi. The hosted connector at riffumi.com is the no-setup alternative for phones and chat apps without code execution.",
         "developerName": "The Burdz, LLC",
         "category": "Productivity",

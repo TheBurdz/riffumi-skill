@@ -24,6 +24,13 @@ Riffumi's servers and works from any AI app that takes MCP connectors, phones in
   /plugin marketplace add TheBurdz/riffumi-skill
   /plugin install riffumi-skill@riffumi
   ```
+
+  In Codex (and the ChatGPT desktop app, where the marketplace then shows as a source in the
+  Plugins Directory):
+
+  ```
+  codex plugin marketplace add TheBurdz/riffumi-skill
+  ```
 - **As a bare skill**: download `riffumi-skill.zip` from the
   [releases](https://github.com/TheBurdz/riffumi-skill/releases) or from
   [riffumi.com/skill](https://riffumi.com/skill), unzip it, and add the `riffumi` folder to your
