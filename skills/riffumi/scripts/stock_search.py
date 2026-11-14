@@ -241,6 +241,13 @@ def make_sheet(results, path, orientation):
 
 # --------------------------------------------------------------------------- pick / download
 
+def _siblings():
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import fetch_asset
+    import inspect_media
+    return fetch_asset, inspect_media
+
+
 def do_pick(args):
     with open(args.pick) as f:
         data = json.load(f)
@@ -255,18 +262,16 @@ def do_pick(args):
         if not c:
             sys.exit(f"beat '{beat}' has no candidate #{n}")
         picks.append((beat, c))
-    fa = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_asset.py")
-    import subprocess
+    fetch_asset, _ = _siblings()
     out = []
     for beat, c in picks:
         name = re.sub(r"[^a-z0-9]+", "_", beat.lower()).strip("_") + f"_{c['provider']}{c['id']}.mp4"
-        cmd = [sys.executable, fa, c["download"], "--to", args.to, "--name", name, "--source", c["provider"],
-               "--license", c["license"], "--creator", c.get("creator", ""), "--page", c.get("page") or "",
-               "--kind", "broll"]
-        r = subprocess.run(cmd, capture_output=True, text=True)
-        ok = r.returncode == 0
-        out.append({"beat": beat, "file": os.path.join(args.to, name) if ok else None, "ok": ok,
-                    "error": None if ok else (r.stderr or r.stdout).strip()[:300]})
+        try:
+            e = fetch_asset.download(c["download"], args.to, name, c["provider"], c["license"],
+                                     c.get("creator", ""), "broll", c.get("page") or "")
+            out.append({"beat": beat, "file": e["saved"], "ok": True, "error": None})
+        except RuntimeError as exc:
+            out.append({"beat": beat, "file": None, "ok": False, "error": str(exc)[:300]})
     print(json.dumps(out, indent=1))
 
 
@@ -356,30 +361,27 @@ def parse_get(spec):
 
 def do_get(args):
     """Download picked Pexels clips through the public download link; sheet them for the eye check."""
-    import subprocess
-    fa = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fetch_asset.py")
+    fetch_asset, inspect_media = _siblings()
     out = []
     for beat, pid, creator in parse_get(args.get):
         name = f"{beat}_pexels{pid}.mp4"
-        cmd = [sys.executable, fa, f"pexels:{pid}", "--to", args.to, "--name", name, "--kind", "broll",
-               "--max-res", str(args.max_res)]
-        if creator:
-            cmd += ["--creator", creator]
-        r = subprocess.run(cmd, capture_output=True, text=True)
-        ok = r.returncode == 0
-        out.append({"beat": beat, "ref": f"pexels:{pid}", "file": os.path.join(args.to, name) if ok else None,
-                    "ok": ok, "error": None if ok else (r.stderr or r.stdout).strip()[:300]})
+        try:
+            e = fetch_asset.download(f"pexels:{pid}", args.to, name, creator=creator, kind="broll",
+                                     max_res=args.max_res)
+            out.append({"beat": beat, "ref": f"pexels:{pid}", "file": e["saved"], "ok": True, "error": None})
+        except RuntimeError as exc:
+            out.append({"beat": beat, "ref": f"pexels:{pid}", "file": None, "ok": False, "error": str(exc)[:300]})
     files = [o["file"] for o in out if o["ok"]]
     result = {"downloaded": out}
     if args.sheet and files:
-        im = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inspect_media.py")
-        r = subprocess.run([sys.executable, im, *files, "--out", args.sheet], capture_output=True, text=True)
-        result["sheet"] = args.sheet if r.returncode == 0 else None
-        if r.returncode != 0:
-            result["sheet_error"] = (r.stderr or r.stdout).strip()[:300]
-        else:
+        try:
+            inspect_media.main([*files, "--out", args.sheet])
+            result["sheet"] = args.sheet
             result["next"] = ("Look at the sheet: one row per clip. Keep what matches the beat by content, light "
                               "and motion; swap anything static, off-vibe or branded for the backup.")
+        except SystemExit as exc:
+            result["sheet"] = None
+            result["sheet_error"] = str(exc)[:300]
     print(json.dumps(result, indent=1))
     if not files:
         sys.exit(2)

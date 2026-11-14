@@ -72,7 +72,7 @@ No telemetry, no account, no calls to riffumi.com.
 ## Build the archives yourself
 
 ```bash
-./build.sh            # dist/riffumi-skill.zip (skill folder) and dist/riffumi-plugin.zip (whole plugin)
+python3 build.py            # dist/riffumi-skill.zip (skill folder) and dist/riffumi-plugin.zip (whole plugin)
 ```
 
 ## Reporting problems

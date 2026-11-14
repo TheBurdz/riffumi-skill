@@ -53,10 +53,10 @@ def resolve_pexels(pid, max_res):
         with urllib.request.urlopen(req, timeout=60) as r:
             final = r.geturl()
     except urllib.error.HTTPError as e:
-        sys.exit(f"pexels: HTTP {e.code} for clip {pid}. Check the id on pexels.com, or ask the user "
-                 f"to paste the clip's Free download link.")
+        raise RuntimeError(f"pexels: HTTP {e.code} for clip {pid}. Check the id on pexels.com, or ask the "
+                           f"user to paste the clip's Free download link.")
     except Exception as e:
-        sys.exit(f"pexels: could not reach the download link for clip {pid}: {e}")
+        raise RuntimeError(f"pexels: could not reach the download link for clip {pid}: {e}")
     if max_res and max_res > 0:
         m = re.search(r"-(uhd|hd|sd)_(\d+)_(\d+)_(\d+fps)\.mp4$", final)
         if m and min(int(m.group(2)), int(m.group(3))) > max_res:
@@ -79,7 +79,56 @@ def resolve_pexels(pid, max_res):
     return final
 
 
-def main():
+def download(url, to="assets", name=None, source="", license="", creator="", kind="", page="",
+             max_res=1080):
+    """Fetch one file (or a Pexels clip reference) into ``to`` and log it in the manifest.
+    Returns the manifest entry plus ``saved``; raises RuntimeError with a plain message."""
+    os.makedirs(to, exist_ok=True)
+    licence = license
+    pid = pexels_id(url) if ("pexels" in url.lower() or re.fullmatch(r"\d+", url.strip())) else None
+    if pid:
+        url = resolve_pexels(pid, max_res)
+        page = page or f"{PEXELS_SITE}/video/{pid}/"
+        source, licence = source or "pexels", licence or PEXELS_LICENSE
+    name = name or os.path.basename(urllib.parse.urlparse(url).path) or "asset"
+    name = re.sub(r"[^A-Za-z0-9._-]+", "_", name)
+    dest = os.path.join(to, name)
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    try:
+        with urllib.request.urlopen(req, timeout=300) as r, open(dest + ".part", "wb") as f:
+            ctype = r.headers.get("Content-Type", "")
+            if "text/html" in ctype:
+                raise RuntimeError(f"refused: {url} returned a web page, not a file. Use the direct file link.")
+            n = 0
+            while True:
+                b = r.read(1 << 16)
+                if not b:
+                    break
+                f.write(b)
+                n += len(b)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"download failed: HTTP {e.code} from {url}. The host may block scripts; try "
+                           f"another source or ask the user for the file.")
+    except RuntimeError:
+        raise
+    except Exception as e:
+        raise RuntimeError(f"download failed: {e}")
+    os.replace(dest + ".part", dest)
+    man = os.path.join(to, "manifest.json")
+    data = []
+    if os.path.isfile(man):
+        with open(man) as f:
+            data = json.load(f)
+    entry = {"file": name, "url": url, "page": page, "source": source, "license": licence,
+             "creator": creator, "kind": kind, "bytes": n,
+             "downloaded": datetime.datetime.now().isoformat(timespec="seconds")}
+    data.append(entry)
+    with open(man, "w") as f:
+        json.dump(data, f, indent=1)
+    return dict(entry, saved=dest)
+
+
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("url", help="a direct file link, or a Pexels clip (pexels:<id>, clip page or download link)")
     ap.add_argument("--to", default="assets")
@@ -91,47 +140,13 @@ def main():
     ap.add_argument("--page", default="")
     ap.add_argument("--max-res", type=int, default=1080,
                     help="Pexels only: prefer the largest rendition up to this height class, 1080 = 1080p (0 = original)")
-    a = ap.parse_args()
-    os.makedirs(a.to, exist_ok=True)
-    url, page, source, licence = a.url, a.page, a.source, a.license
-    pid = pexels_id(a.url) if ("pexels" in a.url.lower() or re.fullmatch(r"\d+", a.url.strip())) else None
-    if pid:
-        url = resolve_pexels(pid, a.max_res)
-        page = page or f"{PEXELS_SITE}/video/{pid}/"
-        source, licence = source or "pexels", licence or PEXELS_LICENSE
-    name = a.name or os.path.basename(urllib.parse.urlparse(url).path) or "asset"
-    name = re.sub(r"[^A-Za-z0-9._-]+", "_", name)
-    dest = os.path.join(a.to, name)
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    a = ap.parse_args(argv)
     try:
-        with urllib.request.urlopen(req, timeout=300) as r, open(dest + ".part", "wb") as f:
-            ctype = r.headers.get("Content-Type", "")
-            if "text/html" in ctype:
-                sys.exit(f"refused: {url} returned a web page, not a file. Use the direct file link.")
-            n = 0
-            while True:
-                b = r.read(1 << 16)
-                if not b:
-                    break
-                f.write(b)
-                n += len(b)
-    except urllib.error.HTTPError as e:
-        sys.exit(f"download failed: HTTP {e.code} from {url}. The host may block scripts; try another "
-                 f"source or ask the user for the file.")
-    except Exception as e:
-        sys.exit(f"download failed: {e}")
-    os.replace(dest + ".part", dest)
-    man = os.path.join(a.to, "manifest.json")
-    data = []
-    if os.path.isfile(man):
-        with open(man) as f:
-            data = json.load(f)
-    data.append({"file": name, "url": url, "page": page, "source": source, "license": licence,
-                 "creator": a.creator, "kind": a.kind, "bytes": n,
-                 "downloaded": datetime.datetime.now().isoformat(timespec="seconds")})
-    with open(man, "w") as f:
-        json.dump(data, f, indent=1)
-    print(json.dumps({"saved": dest, "bytes": n, "url": url, "page": page, "license": licence}))
+        e = download(a.url, a.to, a.name, a.source, a.license, a.creator, a.kind, a.page, a.max_res)
+    except RuntimeError as exc:
+        sys.exit(str(exc))
+    print(json.dumps({"saved": e["saved"], "bytes": e["bytes"], "url": e["url"], "page": e["page"],
+                      "license": e["license"]}))
 
 
 if __name__ == "__main__":

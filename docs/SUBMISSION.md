@@ -6,7 +6,7 @@ linked below; check the portal if a step looks different.
 
 ## Before either portal
 
-- `./build.sh` passes, `claude plugin validate . --profile directory` passes, and the smoke test
+- `python3 build.py` passes, `claude plugin validate . --profile directory` passes, and the smoke test
   renders from `skills/riffumi`.
 - `version` in `plugin.json` and `.claude-plugin/plugin.json` is raised (they must match), the
   release is tagged `v<version>` with `dist/riffumi-skill.zip` attached, and the zip is copied
@@ -61,7 +61,7 @@ The Burdz, LLC first or set `author.name` and `developerName` to the verified in
 name before uploading).
 
 1. **Create plugin**, then **Skills only**.
-2. Upload `dist/riffumi-plugin.zip` (built by `./build.sh`; it holds `plugin.json`,
+2. Upload `dist/riffumi-plugin.zip` (built by `python3 build.py`; it holds `plugin.json`,
    `.claude-plugin/plugin.json`, `skills/`, `README.md`, `LICENSE`, `assets/`).
 3. Review the generated `.codex-plugin/plugin.json`; the listing fields come from
    `extensions.com.openai.interface` in `plugin.json` (display name and subtitle are under 30
@@ -80,6 +80,18 @@ table in the skill README names hosts factually).
 Docs: https://developers.openai.com/plugins/deploy/submission,
 https://developers.openai.com/plugins/guides/submit-claude-plugin,
 https://developers.openai.com/codex/plugins/build.
+
+## Claude validation findings (2026-11-14, first run)
+
+- **Policy hold, image or font files**: the icons in `assets/` and the skill's `fonts/` folder
+  are image or font files that scripts refer to. Nothing runs them; the hold is cleared by the
+  reviewer. Leave it.
+- **Warning, download-and-run command** in `stock_search.py`: fixed in 1.1.3 by importing
+  `fetch_asset` and `inspect_media` instead of running them as subprocesses.
+- **Info, files outside the allowed types** named `build.sh`: replaced by `build.py`. Shell
+  scripts will be accepted only from Verified organizations.
+- **Info, agent-plugins manifest**: the root `plugin.json` is for the OpenAI portal; Claude reads
+  only `.claude-plugin/plugin.json`. Expected.
 
 ## Plugin slug
 
@@ -100,7 +112,7 @@ name, and `riffumi` already belongs to the rejected MCP app from October, so an 
 
 ## Releasing an update
 
-Raise `version` in both manifests, commit, tag `v<version>`, `./build.sh`, attach
+Raise `version` in both manifests, commit, tag `v<version>`, `python3 build.py`, attach
 `dist/riffumi-skill.zip` and `dist/riffumi-plugin.zip` to the release, copy the skill zip into the
 site. The Claude listing follows the tracked branch on its own; the OpenAI listing takes a new
 archive upload.

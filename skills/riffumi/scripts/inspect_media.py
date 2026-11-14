@@ -34,7 +34,7 @@ def grab(path, t, w):
     return Image.open(BytesIO(r.stdout)).convert("RGB")
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("paths", nargs="+")
     ap.add_argument("--out", default="contact_sheet.jpg")
@@ -42,7 +42,7 @@ def main():
     ap.add_argument("--thumb", type=int, default=240, help="thumbnail width")
     ap.add_argument("--at", help="exact seconds to export (single clip)")
     ap.add_argument("--out-dir", default=".")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     need_ffmpeg()
     files = []
     for p in a.paths:
