@@ -161,7 +161,7 @@ Brand colours, the real logo file, one line, a real call to action, held 4+ seco
  "overlay": [{"type": "sparkles", "amount": 0.7, "density": 0.8, "tint": "#FBB825"}, {"type": "light-sweep", "amount": 0.15}],
  "effects": ["vignette"],
  "layers": [
-  {"type": "image", "src": "assets/logo.png", "h": 0.4, "y": 0.25, "glow": "#FBB825", "in": {"anim": "elastic", "dur": 0.5}},
+  {"type": "image", "src": "brand/logo.png", "h": 0.4, "y": 0.25, "glow": "#FBB825", "in": {"anim": "elastic", "dur": 0.5}},
   {"text": "<PRODUCT OR LINE>", "font": "Poppins-800", "size": 108, "y": 0.535, "tracking": 10, "start": "1b", "in": {"anim": "tracking", "dur": 0.5}},
   {"type": "shape", "shape": "rect", "y": 0.6, "w": 0.07, "h": 0.006, "radius": 3, "color": "#FBB825", "start": "2b", "in": {"anim": "draw", "dur": 0.4}},
   {"text": "<one-line promise>", "font": "Poppins-600", "size": 52, "y": 0.665, "color": "#FFFFFFCC", "start": "2b", "in": {"anim": "stagger"}},

@@ -83,9 +83,9 @@ https://developers.openai.com/codex/plugins/build.
 
 ## Claude validation findings (2026-11-14, first run)
 
-- **Policy hold, image or font files**: the icons in `assets/` and the skill's `fonts/` folder
-  are image or font files that scripts refer to. Nothing runs them; the hold is cleared by the
-  reviewer. Leave it.
+- **Policy hold, image or font files**: three documentation lines named the icon files by path
+  (this file, the OpenAI manifest, and a recipe example that happened to use the same path).
+  Fixed in 1.1.4: no file in the plugin names a bundled image path any more.
 - **Warning, download-and-run command** in `stock_search.py`: fixed in 1.1.3 by importing
   `fetch_asset` and `inspect_media` instead of running them as subprocesses.
 - **Info, files outside the allowed types** named `build.sh`: replaced by `build.py`. Shell
@@ -106,7 +106,9 @@ name, and `riffumi` already belongs to the rejected MCP app from October, so an 
 - Subtitle: `Direct videos from your own clips`
 - Category: Productivity
 - Long description: the `longDescription` in `plugin.json`.
-- Icon and logo: `assets/icon.png`, `assets/logo.png` (512 x 512 PNG).
+- Icon and logo: the two 512 x 512 PNGs in the assets folder. The OpenAI portal takes them as
+  uploads in the listing form; the manifest does not reference them (the Claude directory holds a
+  plugin for review when any file names a bundled image path).
 - Links: https://riffumi.com/skill, https://riffumi.com/help, https://riffumi.com/privacy,
   https://riffumi.com/terms.
 
