@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Render a video from a JSON edit spec (see references/spec-format.md).
 
     python3 render.py spec.json                      # final render -> spec.output

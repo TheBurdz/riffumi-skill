@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build the composite shots that make a cut look produced, in one command each.
 
     # 2-4 clips side by side (or stacked) - turns portrait b-roll into a landscape beat

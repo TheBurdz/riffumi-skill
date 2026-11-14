@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Find the tempo and beat grid of a music track so cuts can land on the beat.
 
     python3 beats.py track.mp3 [--min-bpm 70 --max-bpm 180] [--fps 30] [--json out.json]

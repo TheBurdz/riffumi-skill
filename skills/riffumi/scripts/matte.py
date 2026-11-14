@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Cut a subject out of a still image.
 
     python3 matte.py product.jpg --out product_cutout.png [--mask-out mask.png]

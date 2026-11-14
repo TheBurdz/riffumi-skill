@@ -93,6 +93,13 @@ https://developers.openai.com/codex/plugins/build.
 - **Info, agent-plugins manifest**: the root `plugin.json` is for the OpenAI portal; Claude reads
   only `.claude-plugin/plugin.json`. Expected.
 
+## Verified-organization rule (2026-11-14, refused once)
+
+A non-Verified organization may ship only Markdown, text, JSON, YAML and images. Anything
+that starts with `#!` counts as a program, so the Python scripts carry no shebang line (they are
+always run as `python3 scripts/<name>.py`), no file has an executable bit, there is no shell
+script, and `marketplace.json` carries only the documented fields. Keep it that way.
+
 ## Plugin slug
 
 The plugin's `name` is `riffumi-skill` (2026-11-14): the OpenAI portal keys uploads on the

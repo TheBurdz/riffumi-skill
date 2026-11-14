@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Look at your material before planning: one contact sheet per file or for a whole folder.
 
     python3 inspect_media.py clip.mp4 photo.jpg ... --out sheet.jpg [--per-clip 4]

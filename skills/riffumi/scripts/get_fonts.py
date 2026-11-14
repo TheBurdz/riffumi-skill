@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Fetch open-licence (SIL OFL) font families into the skill's fonts/ folder.
 
     python3 get_fonts.py "Anton" "Playfair Display:700" "Inter:900" "Caveat"

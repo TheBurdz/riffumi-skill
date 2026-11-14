@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Check an edit spec before rendering. Fails stop the render; warnings are judgment calls.
 
     python3 preflight.py spec.json            # human summary, exit 1 on any FAIL

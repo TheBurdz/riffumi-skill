@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Report what this machine can do for video work, so the agent picks the right route.
 
     python3 check_env.py            # human summary

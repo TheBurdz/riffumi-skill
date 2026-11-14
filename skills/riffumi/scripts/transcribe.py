@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Word-timed transcript for captions and talking-head cut lists.
 
     python3 transcribe.py take.mp4 --out take_words.json [--srt take.srt] [--model small]

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build the two archives (no caches, no fetched fonts, no system files):
 
   dist/riffumi-skill.zip    the skill folder alone (unzips to riffumi/); served from riffumi.com/skill

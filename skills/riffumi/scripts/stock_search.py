@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Find b-roll on pexels.com without any key, or through the stock APIs when the user hands you one.
 
 Default route (no key): the script builds the pexels.com search page for each beat, with the

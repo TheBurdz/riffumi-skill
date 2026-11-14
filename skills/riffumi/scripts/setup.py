@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Install what the Riffumi skill needs to render on this machine.
 
     python3 scripts/setup.py          # install numpy + Pillow for this Python, report ffmpeg

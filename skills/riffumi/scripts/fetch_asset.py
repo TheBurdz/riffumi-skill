@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Download a stock clip, photo, music track or sound and record where it came from.
 
     python3 fetch_asset.py URL --to assets/ [--name city_night.mp4]
