@@ -169,7 +169,7 @@ def production_report(spec, scenes, durs, total, clk, level, base, offline=False
     tex = sum(1 for sc in scenes if sc.get("effects") or sc.get("overlay"))
     check(tex >= (3 if level == "wild" else 1), 6,
           warn_msg="no effects or overlays: add grain/vignette for depth and one energy device (beat-flash, glitch-in, "
-                   "light-sweep, confetti...) where the music peaks")
+                   "light-sweep, shimmer, confetti...) where the music peaks")
     # 10. graphic proof
     check(len(graphic_layers) >= 2, 7,
           warn_msg="no information graphics or cutouts: show real facts as blocks (stars, counter, checklist, callout) "

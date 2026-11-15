@@ -82,6 +82,7 @@ Typical lengths: 0.15-0.25 s energetic, 0.35-0.6 s calm.
   is dreamy; `glow` blooms highlights; `letterbox` reads cinematic.
 - `beat-flash` makes footage pulse on every beat - great on music-sync stretches, tiring beyond ~6 s.
 - Overlays: `light-leak` (warm, nostalgic), `light-sweep` (one shiny pass on a hero frame),
+  `shimmer` (the sheen stays on the artwork: label type, logo, title card; the background keeps still),
   `bokeh` (dreamy, festive), `confetti` (celebration, launches, sales), `dust`/`embers`/`sparkles`
   (atmosphere), `snow`/`rain` (season, mood), `speed-lines` (comic impact, energy).
   One overlay family per piece unless it is the device.

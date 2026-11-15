@@ -457,6 +457,9 @@ def effect(a, name, amt, ctx, t_global, t_local, sc):
 
 # =========================================================================== overlays
 
+_DIAG = {}
+
+
 def _screen(a, layer):
     return 255 - (255 - a) * (255 - layer) / 255.0
 
@@ -509,6 +512,38 @@ def overlay(a, ov, ctx, t, dur, scene_index):
         m = np.asarray(layer, np.float32)[..., None] / 255.0
         col = np.array((tint or (255, 255, 255, 255))[:3], np.float32)
         return a * (1 - m) + col * m
+    if kind == "shimmer":
+        # one travelling highlight that brightens only the artwork in the picture (light type, warm or
+        # cool print) and leaves the rest alone: a sheen on a label, a logo, a title card
+        p = t / max(dur, 0.01)
+        start = float(ov.get("start", 0.15))
+        span = max(float(ov.get("span", 0.6)), 0.05)
+        u = (p - start) / span
+        if u < -0.25 or u > 1.25:
+            return a
+        f = a / 255.0
+        r, g, b = f[..., 0], f[..., 1], f[..., 2]
+        which = str(ov.get("mask", "bright-warm"))
+        thr = float(ov.get("threshold", 0.42))
+        m = np.zeros(r.shape, np.float32)
+        if "bright" in which:
+            m = np.maximum(m, np.clip((0.299 * r + 0.587 * g + 0.114 * b - thr) / 0.18, 0, 1))
+        if "warm" in which:
+            m = np.maximum(m, np.clip(((r - g) - 0.12) / 0.15, 0, 1))
+        if "cool" in which:
+            m = np.maximum(m, np.clip(((b - r) - 0.12) / 0.15, 0, 1))
+        mi = Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(max(1.0, ctx.px(1.2))))
+        m = np.asarray(mi, np.float32) / 255.0
+        key = (W, H)
+        if key not in _DIAG:
+            yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+            _DIAG[key] = (xx / W) * 0.75 + (yy / H) * 0.25
+        pos = -0.25 + u * 1.5
+        width = float(ov.get("width", 0.07))
+        band = np.exp(-((_DIAG[key] - pos) / width) ** 2) * clamp(1 - abs(u - 0.5) * 0.6)
+        col = np.array((tint or (255, 247, 230, 255))[:3], np.float32) / 255.0
+        gain = (band * m * amt)[..., None]
+        return a + (255.0 - a) * gain * col
     # particle families
     n = int({"bokeh": 26, "confetti": 70, "dust": 90, "snow": 120, "rain": 140, "sparkles": 40,
              "embers": 60}.get(kind, 50) * float(ov.get("density", 1)))

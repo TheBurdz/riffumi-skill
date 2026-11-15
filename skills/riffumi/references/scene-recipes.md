@@ -168,6 +168,18 @@ Brand colours, the real logo file, one line, a real call to action, held 4+ seco
   {"text": "<CTA>", "font": "Poppins-800", "size": 44, "y": 0.8, "panel": {"color": "#FF0000", "opacity": 1, "radius": 14, "pad": 28}, "start": "4b", "in": {"anim": "pop", "dur": 0.3}, "beat_bounce": 0.03}]}
 ```
 
+## 16. Label close-up with a shimmer
+A tight crop of the real pack, a slow camera move, and one highlight that travels across the
+print only: the type and the logo catch the light, the pack itself stays still. Three of these
+read the product's own label as the story; no words needed on top.
+```json
+{"type": "image", "src": "assets/pack.jpg", "crop": [0.28, 0.40, 0.70, 0.76], "beats": 3, "transition": {"type": "zoom", "dur": 0.25},
+ "grade": "warm", "camera": "push-in", "camera_amount": 0.08,
+ "overlay": {"type": "shimmer", "amount": 0.6, "start": 0.15, "span": 0.6},
+ "effects": ["vignette", {"type": "grain", "amount": 0.4}]}
+```
+Use `"mask": "bright-cool"` for blue or silver print, `"threshold"` lower for dim type.
+
 ---
 
 ## Before / after: the same brief, plain vs produced

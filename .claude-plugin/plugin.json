@@ -1,6 +1,6 @@
 {
   "name": "riffumi-skill",
-  "version": "1.1.7",
+  "version": "1.2.0",
   "description": "Riffumi, the local edition: a video director your agent follows, with an ffmpeg renderer, keyless stock b-roll from pexels.com, beat sync, cutouts, composites and a production bar it measures before delivering. Turns the user's own clips and photos into finished videos.",
   "author": {
     "name": "The Burdz, LLC",

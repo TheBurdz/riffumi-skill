@@ -93,8 +93,13 @@ Each takes `amount` and can be forced with `"on": "picture" | "frame"`.
 
 ### Overlays
 
-`light-leak, light-sweep, bokeh, confetti, dust, sparkles, embers, snow, rain, speed-lines`
+`light-leak, light-sweep, bokeh, confetti, dust, sparkles, embers, snow, rain, speed-lines, shimmer`
 with `amount` (opacity), `density`, `speed`, `tint`, `colors` (confetti/bokeh palette).
+`shimmer` is different: it brightens only the artwork already in the picture (light type, warm or cool
+print) with one travelling highlight and leaves the background alone, so a label, a logo or a title
+card catches the light: `{"type": "shimmer", "amount": 0.6, "start": 0.15, "span": 0.6, "mask":
+"bright-warm", "threshold": 0.42, "width": 0.07, "tint": "#fff7e6"}` (`start` and `span` are shares of
+the scene; `mask` is any mix of `bright`, `warm`, `cool`). It runs on the picture, under text layers.
 Several at once: `"overlay": [{...}, {...}]`.
 
 ### Transitions (incoming)

@@ -1,20 +1,149 @@
 {
  "_comment": "Install check: needs no files. python3 scripts/render.py examples/smoke-test.json --preview",
- "canvas": {"width": 1080, "height": 1920, "fps": 30},
+ "canvas": {
+  "width": 1080,
+  "height": 1920,
+  "fps": 30
+ },
  "output": "smoke-test.mp4",
- "meta": {"level": "safe", "music": false, "broll": false, "broll_reason": "install check with no media files", "platform": "tiktok", "facts": ["3 steps"]},
+ "meta": {
+  "level": "safe",
+  "music": false,
+  "broll": false,
+  "broll_reason": "install check with no media files",
+  "platform": "tiktok",
+  "facts": [
+   "3 steps"
+  ]
+ },
  "scenes": [
-  {"type": "gradient", "colors": ["#0D121D", "#2a1a1f", "#F86146"], "angle": 110, "spin": 25, "dur": 2.2,
-   "overlay": {"type": "bokeh", "amount": 0.6},
-   "layers": [{"text": "It works.", "font": "sans:bold", "size": 190, "y": 0.4, "stroke": 8, "glow": "#F86146", "in": "none"},
-              {"text": "Riffumi is ready", "size": 70, "y": 0.52, "in": {"anim": "stagger", "dur": 0.3}, "start": 0.4}]},
-  {"type": "color", "color": "#0D121D", "dur": 2.4, "transition": {"type": "circle-open", "dur": 0.4},
-   "layers": [{"type": "block", "block": "step", "w": 0.8, "y": 0.3, "props": {"number": 1, "label": "Plan", "accent": "#F86146"}},
-              {"type": "block", "block": "step", "w": 0.8, "y": 0.45, "start": 0.4, "props": {"number": 2, "label": "Preview", "accent": "#FFFCF8"}},
-              {"type": "block", "block": "step", "w": 0.8, "y": 0.6, "start": 0.8, "props": {"number": 3, "label": "Render", "accent": "#F86146"}}]},
-  {"type": "gradient", "colors": ["#F86146", "#ff8a6a"], "angle": 60, "dur": 2.0, "transition": {"type": "whip-up", "dur": 0.25},
-   "overlay": {"type": "confetti", "amount": 0.9},
-   "layers": [{"text": "3 steps", "size": 200, "y": 0.4, "stroke": 10, "in": {"anim": "drop", "dur": 0.45}},
-              {"type": "block", "block": "cta", "w": 0.7, "y": 0.62, "start": 0.5, "props": {"label": "Make one", "accent": "#0D121D"}}]}
+  {
+   "type": "gradient",
+   "colors": [
+    "#0D121D",
+    "#2a1a1f",
+    "#F86146"
+   ],
+   "angle": 110,
+   "spin": 25,
+   "dur": 2.2,
+   "overlay": {
+    "type": "bokeh",
+    "amount": 0.6
+   },
+   "layers": [
+    {
+     "text": "It works.",
+     "font": "sans:bold",
+     "size": 190,
+     "y": 0.4,
+     "stroke": 8,
+     "glow": "#F86146",
+     "in": "none"
+    },
+    {
+     "text": "Riffumi is ready",
+     "size": 70,
+     "y": 0.52,
+     "in": {
+      "anim": "stagger",
+      "dur": 0.3
+     },
+     "start": 0.4
+    }
+   ]
+  },
+  {
+   "type": "color",
+   "color": "#0D121D",
+   "dur": 2.4,
+   "transition": {
+    "type": "circle-open",
+    "dur": 0.4
+   },
+   "layers": [
+    {
+     "type": "block",
+     "block": "step",
+     "w": 0.8,
+     "y": 0.3,
+     "props": {
+      "number": 1,
+      "label": "Plan",
+      "accent": "#F86146"
+     }
+    },
+    {
+     "type": "block",
+     "block": "step",
+     "w": 0.8,
+     "y": 0.45,
+     "start": 0.4,
+     "props": {
+      "number": 2,
+      "label": "Preview",
+      "accent": "#FFFCF8"
+     }
+    },
+    {
+     "type": "block",
+     "block": "step",
+     "w": 0.8,
+     "y": 0.6,
+     "start": 0.8,
+     "props": {
+      "number": 3,
+      "label": "Render",
+      "accent": "#F86146"
+     }
+    }
+   ]
+  },
+  {
+   "type": "gradient",
+   "colors": [
+    "#F86146",
+    "#ff8a6a"
+   ],
+   "angle": 60,
+   "dur": 2.0,
+   "transition": {
+    "type": "whip-up",
+    "dur": 0.25
+   },
+   "overlay": [
+    {
+     "type": "confetti",
+     "amount": 0.9
+    },
+    {
+     "type": "shimmer",
+     "amount": 0.6
+    }
+   ],
+   "layers": [
+    {
+     "text": "3 steps",
+     "size": 200,
+     "y": 0.4,
+     "stroke": 10,
+     "in": {
+      "anim": "drop",
+      "dur": 0.45
+     }
+    },
+    {
+     "type": "block",
+     "block": "cta",
+     "w": 0.7,
+     "y": 0.62,
+     "start": 0.5,
+     "props": {
+      "label": "Make one",
+      "accent": "#0D121D"
+     }
+    }
+   ]
+  }
  ]
 }
