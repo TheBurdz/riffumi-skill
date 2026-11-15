@@ -6,6 +6,12 @@ production bar it measures before delivering. The agent turns the user's own cli
 into finished videos: product showcases, social posts, stories, ads, how-tos, highlight reels.
 MIT licensed. Nothing is sent to Riffumi.
 
+<a href="https://x.com/riffumiHQ/status/2121697049825677787"><img src="https://riffumi.com/skill/preview" width="270" alt="Eight seconds of a vertical coffee ad the skill cut from eight PNGs and stock b-roll"></a>
+
+Eight PNGs for a made-up coffee brand, a one-line brief, no API keys. The clip above
+is the result, untouched; the [full post on X](https://x.com/riffumiHQ/status/2121697049825677787)
+shows the install and the session that made it.
+
 This repository is a plugin with one skill. The skill lives in
 [`skills/riffumi/`](skills/riffumi/): start with its [README](skills/riffumi/README.md) and
 [SKILL.md](skills/riffumi/SKILL.md). The same folder is what the zip on
@@ -77,4 +83,9 @@ python3 build.py            # dist/riffumi-skill.zip (skill folder) and dist/rif
 
 ## Reporting problems
 
-Open an issue here, or email support@riffumi.com. News and examples: [@riffumiHQ on X](https://x.com/riffumiHQ).
+Open an issue here, or email support@riffumi.com.
+
+News and examples: [X](https://x.com/riffumiHQ), [YouTube](https://www.youtube.com/@riffumi),
+[TikTok](https://www.tiktok.com/@riffumi), [Instagram](https://www.instagram.com/riffumi/),
+[LinkedIn](https://www.linkedin.com/company/riffumi/),
+[Facebook](https://www.facebook.com/profile.php?id=61595754728731).
