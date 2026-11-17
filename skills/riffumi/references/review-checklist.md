@@ -3,8 +3,9 @@
 Run `preflight.py spec.json` first and fix every FAIL. For bold and wild work the production score
 must clear its floor (65 bold, 80 wild); report the score with the delivery. Then render a contact sheet
 (`--sheet 12`) and full-size stills (`--stills`) at the busiest moments - the hook, each text
-beat, the reveal, the end card - and actually look at them. Only then render the video,
-which is always full size. One full render per request is the goal.
+beat, the reveal, the end card - and actually look at them. Only then render: a half-size
+draft (`--scale 0.5`) when you need to see motion or hear the mix, then the full-size video,
+which is the only file the user receives. One full render per request is the goal.
 
 ## Promise
 - [ ] Length matches what was promised (within ~10%); the plan was not quietly shortened.

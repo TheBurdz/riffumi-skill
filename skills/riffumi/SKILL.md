@@ -163,14 +163,16 @@ its structure). Put `meta.level`, `meta.concept`, `meta.device`, `meta.facts` in
 python3 scripts/preflight.py spec.json                 # fix every FAIL; production score must clear the floor
 python3 scripts/render.py spec.json --sheet 24         # look at the whole cut
 python3 scripts/render.py spec.json --stills 0,4.2,9.8 # full-size frames at the busiest moments
-python3 scripts/render.py spec.json                    # the video, full canvas size, with sound
+python3 scripts/render.py spec.json --scale 0.5        # half-size draft to check motion and sound (*_draft.mp4)
+python3 scripts/render.py spec.json                    # the video: full canvas size, the only file delivered
 python3 scripts/render.py spec.json --only 3           # after changing scene 3
 ```
 
-Every MP4 the renderer writes is the full canvas (1920x1080 or 1080x1920 unless the spec says
-otherwise), so the file you hand over is always the upload-ready one. `--scale 0.5` is a quick
-draft for your own check of a long cut; it is written as `<output>_draft.mp4` and is never
-delivered.
+Check cheaply, deliver at full size. The sheet, the stills and the half-size draft are for your
+own checking (the draft is four times faster than the full render and is written as
+`<output>_draft.mp4`, with `"draft": true` in the summary). The user only ever receives the plain
+render: the full canvas, 1920x1080 or 1080x1920 unless the spec says otherwise, ready to upload.
+Never hand over, link or describe a `_draft.mp4` as the video.
 
 If the sheet looks plain, it is: go back to the worksheet and raise the weakest beats before the
 final render. Generation and connected-tool routes: `references/routing-and-generation.md`.
@@ -184,7 +186,7 @@ Special workflows (talking head, screen recordings, loops, before/after, batches
    footage carrying most beats, matched grade, music cut on the beat and ending clean, length as
    promised, the device visible.
 2. Fix with targeted re-renders (`--only`), not rebuilds.
-3. Deliver: the file, one line on concept and device, the production score, sources and licences
+3. Deliver: the full-size file (the plain render, never a `_draft.mp4`), one line on concept and device, the production score, sources and licences
    (from `broll/manifest.json`), and one or two directions for a next version.
 
 ## Scripts
