@@ -41,7 +41,7 @@ Then, in the skill folder:
 ```bash
 python3 scripts/setup.py                       # installs numpy + Pillow; prints the ffmpeg command
 python3 scripts/check_env.py                   # what this machine can do, online or offline
-python3 scripts/render.py examples/smoke-test.json --preview
+python3 scripts/render.py examples/smoke-test.json
 ```
 
 ## What the skill runs, fetches and sends

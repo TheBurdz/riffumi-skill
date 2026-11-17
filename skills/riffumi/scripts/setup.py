@@ -70,7 +70,7 @@ def main():
         hint = FFMPEG_HINTS.get(platform.system(), "install ffmpeg from ffmpeg.org/download.html")
         print("ffmpeg: MISSING. Install it with:\n  " + hint)
     print("done. Run python3 scripts/check_env.py to confirm, then "
-          "python3 scripts/render.py examples/smoke-test.json --preview")
+          "python3 scripts/render.py examples/smoke-test.json")
 
 
 if __name__ == "__main__":

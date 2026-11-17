@@ -102,7 +102,7 @@ device, and what the viewer sees in the first two seconds and the last two. Scor
 pasted onto a competitor. Full method, 22 structures, 60+ devices: `references/creative-system.md`.
 
 Real brief: show the three, let the user pick. Thin request: build the top scorer and mention the
-other two after the preview.
+other two after the first render.
 
 ## 4. Gather material
 
@@ -163,10 +163,14 @@ its structure). Put `meta.level`, `meta.concept`, `meta.device`, `meta.facts` in
 python3 scripts/preflight.py spec.json                 # fix every FAIL; production score must clear the floor
 python3 scripts/render.py spec.json --sheet 24         # look at the whole cut
 python3 scripts/render.py spec.json --stills 0,4.2,9.8 # full-size frames at the busiest moments
-python3 scripts/render.py spec.json --preview          # half-size draft with sound
-python3 scripts/render.py spec.json                    # final
+python3 scripts/render.py spec.json                    # the video, full canvas size, with sound
 python3 scripts/render.py spec.json --only 3           # after changing scene 3
 ```
+
+Every MP4 the renderer writes is the full canvas (1920x1080 or 1080x1920 unless the spec says
+otherwise), so the file you hand over is always the upload-ready one. `--scale 0.5` is a quick
+draft for your own check of a long cut; it is written as `<output>_draft.mp4` and is never
+delivered.
 
 If the sheet looks plain, it is: go back to the worksheet and raise the weakest beats before the
 final render. Generation and connected-tool routes: `references/routing-and-generation.md`.
@@ -198,7 +202,7 @@ Special workflows (talking head, screen recordings, loops, before/after, batches
 | `fetch_asset.py` | Download any file the user may use and log its licence; `pexels:<id>` needs no key |
 | `transcribe.py` | Word timings for captions and talking-head cuts (needs a whisper package) |
 | `preflight.py` | Checks a spec: files, length, platform, claims, b-roll share, production bar score; `--offline` relaxes fonts and b-roll |
-| `render.py` | Renders a spec: stills, contact sheets, previews, finals, single-scene re-renders |
+| `render.py` | Renders a spec: stills, contact sheets, the full-size video, single-scene re-renders |
 
 Requirements: Python 3.8+, `numpy`, `Pillow`, `ffmpeg`. Optional: `scipy` (faster mattes), `rembg`
 (cutouts from busy photos), `faster-whisper` (transcripts). No API keys: b-roll comes from pexels.com

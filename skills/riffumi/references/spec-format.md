@@ -1,7 +1,7 @@
 # Edit spec format (scripts/render.py)
 
 A spec is one JSON file. Paths are relative to the spec file. Sizes are in **design pixels**
-of the canvas (they scale for previews). Positions are **fractions** of the canvas (0-1).
+of the canvas (they scale down for `--scale` drafts). Positions are **fractions** of the canvas (0-1).
 
 ## Time values
 
@@ -202,9 +202,9 @@ Shows a few words at a time and recolours the spoken one. `offset` shifts all ti
 ## Command line
 
 ```
-render.py spec.json [--preview] [--scale 0.5] [--stills 0,3.2] [--sheet 12]
+render.py spec.json [--scale 0.5] [--stills 0,3.2] [--sheet 12]
                     [--only 2,5] [--audio-only] [--out file.mp4] [--workdir dir]
 ```
 
-Scene files go in `<output>_parts/` (prefix `p` for previews, `f` for finals), so `--only`
+Scene files go in `<output>_parts/` (prefix `d` for `--scale` drafts, `f` for full size), so `--only`
 re-renders just what changed (and the scene after it when a transition depends on it).

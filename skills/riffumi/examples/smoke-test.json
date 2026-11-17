@@ -1,5 +1,5 @@
 {
- "_comment": "Install check: needs no files. python3 scripts/render.py examples/smoke-test.json --preview",
+ "_comment": "Install check: needs no files. python3 scripts/render.py examples/smoke-test.json",
  "canvas": {
   "width": 1080,
   "height": 1920,

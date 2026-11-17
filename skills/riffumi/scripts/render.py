@@ -1,7 +1,7 @@
 """Render a video from a JSON edit spec (see references/spec-format.md).
 
-    python3 render.py spec.json                      # final render -> spec.output
-    python3 render.py spec.json --preview            # half size, fast encode
+    python3 render.py spec.json                      # the video, full canvas size -> spec.output
+    python3 render.py spec.json --scale 0.5          # quick half-size draft -> <output>_draft.mp4 (not for delivery)
     python3 render.py spec.json --stills 0,3.2,7.5   # full-size JPEGs at those seconds
     python3 render.py spec.json --sheet 12           # one contact sheet of 12 frames
     python3 render.py spec.json --only 4             # re-render scene 4 (and reuse the rest)
@@ -1705,16 +1705,16 @@ def render_scene_frames(ctx, scenes, i, ranges, total_frames, sink, frame_filter
     S.close()
 
 
-def encoder_args(preview):
-    if preview:
+def encoder_args(draft):
+    if draft:
         return ["-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-pix_fmt", "yuv420p"]
     return ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p"]
 
 
-def encode_scene(ctx, scenes, i, ranges, total_frames, out_path, preview):
+def encode_scene(ctx, scenes, i, ranges, total_frames, out_path, draft):
     tmp = out_path[:-4] + ".part.mp4"
     cmd = ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{ctx.W}x{ctx.H}",
-           "-r", str(ctx.fps), "-i", "-"] + encoder_args(preview) + ["-r", str(ctx.fps), "-an", tmp]
+           "-r", str(ctx.fps), "-i", "-"] + encoder_args(draft) + ["-r", str(ctx.fps), "-an", tmp]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     try:
         render_scene_frames(ctx, scenes, i, ranges, total_frames, lambda gf, fr: p.stdin.write(fr.tobytes()))
@@ -1844,8 +1844,11 @@ def build_audio(ctx, scenes, total, out_audio):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("spec")
-    ap.add_argument("--preview", action="store_true", help="half size, fast encode")
-    ap.add_argument("--scale", type=float, help="render scale (default 1, preview 0.5)")
+    ap.add_argument("--preview", action="store_true",
+                    help="accepted for older instructions; renders the full-size video like a plain run")
+    ap.add_argument("--scale", type=float,
+                    help="quick draft at a fraction of the canvas (0.5 = half size); written as "
+                         "<output>_draft.mp4 and not for delivery")
     ap.add_argument("--stills", help="comma-separated seconds to render as JPEG")
     ap.add_argument("--sheet", type=int, help="contact sheet with N evenly spaced frames")
     ap.add_argument("--only", help="comma-separated scene indexes to re-render")
@@ -1855,17 +1858,26 @@ def main():
     a = ap.parse_args()
     need_ffmpeg()
     spec = load_spec(a.spec)
-    scale = a.scale or (0.5 if a.preview else 1.0)
+    # Every MP4 is rendered at the full canvas size (1080p by default): there is no separate
+    # preview file to mistake for the finished video. --scale below 1 is a quick draft for
+    # checking a long cut; it is written as <output>_draft.mp4 and is not for delivery.
+    if a.scale is not None and not 0 < a.scale <= 1:
+        die("--scale must be above 0 and at most 1")
+    if a.preview:
+        print("note: --preview now renders the full-size video, the same as a plain run", file=sys.stderr)
+    scale = a.scale or 1.0
     if (a.stills or a.sheet) and not a.scale:
         scale = 1.0 if a.stills else 0.5
+    draft = scale != 1.0 and not (a.stills or a.sheet)
     ctx = Ctx(spec, a.spec, scale)
     scenes, total = build_scenes(ctx)
     ranges = scene_frame_ranges(scenes, ctx.clock)
     total_frames = ranges[-1][1]
     out = ctx.path(a.out or spec.get("output", "video.mp4"))
-    if a.preview and not a.out:
-        out = out[:-4] + "_preview.mp4"
-    print(f"{len(scenes)} scenes, {total:.2f}s, {ctx.W}x{ctx.H} @ {ctx.fps}fps", file=sys.stderr)
+    if draft and not a.out:
+        out = out[:-4] + "_draft.mp4"
+    note = f" (draft at {scale:g}x, not for delivery)" if draft else ""
+    print(f"{len(scenes)} scenes, {total:.2f}s, {ctx.W}x{ctx.H} @ {ctx.fps}fps{note}", file=sys.stderr)
 
     if a.stills or a.sheet:
         if a.stills:
@@ -1908,7 +1920,7 @@ def main():
 
     work = ctx.path(a.workdir) if a.workdir else os.path.splitext(out)[0] + "_parts"
     os.makedirs(work, exist_ok=True)
-    tag = "p" if scale != 1.0 else "f"
+    tag = "d" if draft else "f"
     files = [os.path.join(work, f"{tag}{i:03d}.mp4") for i in range(len(scenes))]
     if not a.audio_only:
         only = None
@@ -1920,7 +1932,7 @@ def main():
             if only is not None and i not in only and os.path.isfile(files[i]):
                 continue
             print(f"scene {i + 1}/{len(scenes)} ({scenes[i].type}, {scenes[i].dur:.2f}s)", file=sys.stderr)
-            encode_scene(ctx, scenes, i, ranges, total_frames, files[i], scale != 1.0)
+            encode_scene(ctx, scenes, i, ranges, total_frames, files[i], draft)
     lst = os.path.join(work, "concat.txt")
     with open(lst, "w") as f:
         for p in files:
@@ -1942,7 +1954,7 @@ def main():
     os.replace(tmp, out)
     info = probe(out)
     print(json.dumps({"output": out, "seconds": round(info["duration"], 3), "width": info["width"],
-                      "height": info["height"], "audio": info["has_audio"]}))
+                      "height": info["height"], "audio": info["has_audio"], "draft": draft}))
 
 
 if __name__ == "__main__":

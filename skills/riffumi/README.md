@@ -44,7 +44,7 @@ riffumi/
   scripts/
     check_env.py                what this machine can do; saves .riffumi_env.json for preflight
     setup.py                    installs numpy + Pillow for this Python, prints the ffmpeg command
-    render.py                   JSON edit spec -> MP4 (stills, contact sheets, previews, finals)
+    render.py                   JSON edit spec -> MP4 (stills, contact sheets, full-size video)
     stock_search.py             b-roll from pexels.com with no key (search pages + public download); APIs when given a key
     compose.py                  split screens, phone reveals, product-on-colour fields
     preflight.py                checks a spec before rendering (offline-aware)
@@ -71,7 +71,7 @@ riffumi/
   `faster-whisper` (transcripts for captions): `python3 scripts/setup.py --extras`
 
 Check: `python3 scripts/check_env.py`, then
-`python3 scripts/render.py examples/smoke-test.json --preview`.
+`python3 scripts/render.py examples/smoke-test.json`.
 
 ## Where it runs
 
@@ -110,8 +110,8 @@ Just ask, in your own words:
 - "Three different 15 s hooks for this ad, same body"
 - "Recut this 16:9 video for Reels and Shorts"
 
-The agent will propose concepts (or just build when the request is thin), show you a preview,
-and refine from your notes.
+The agent will propose concepts (or just build when the request is thin), show you the video
+(always full size, 1080p by default), and refine from your notes.
 
 ## Licence
 
