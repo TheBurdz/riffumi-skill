@@ -116,5 +116,6 @@ The agent will propose concepts (or just build when the request is thin), show y
 ## Licence
 
 MIT, The Burdz, LLC - see LICENSE. Stock media, music and fonts you download keep their own
-licences; the skill records them in `assets/manifest.json`. Riffumi is a trademark of
+licences; the skill records them in `assets/manifest.json`. Stock footage from
+[Pexels](https://www.pexels.com). Riffumi is a trademark of
 The Burdz, LLC; the hosted service at riffumi.com has its own terms.

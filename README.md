@@ -69,6 +69,9 @@ and `ffprobe`. Nothing is compiled, minified or downloaded as code at run time.
 
 No telemetry, no account, no calls to riffumi.com.
 
+Stock footage from [Pexels](https://www.pexels.com). Clips keep the Pexels licence, and the
+manifest records each clip's page and creator.
+
 ## Build the archives yourself
 
 ```bash
